@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap');
-        
+
         body {
             font-family: 'Exo 2', sans-serif;
             background-color: #060a0f;
@@ -23,10 +24,25 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
-        .accent-blue { color: #60a5fa; text-shadow: 0 0 10px rgba(96, 165, 250, 0.5); }
-        .accent-green { color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
-        .accent-purple { color: #a78bfa; text-shadow: 0 0 10px rgba(167, 139, 250, 0.5); }
-        .accent-orange { color: #fb923c; text-shadow: 0 0 10px rgba(251, 146, 60, 0.5); }
+        .accent-blue {
+            color: #60a5fa;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+
+        .accent-green {
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+        }
+
+        .accent-purple {
+            color: #a78bfa;
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        }
+
+        .accent-orange {
+            color: #fb923c;
+            text-shadow: 0 0 10px rgba(251, 146, 60, 0.5);
+        }
 
         .progress-bar-container {
             height: 12px;
@@ -59,7 +75,8 @@
             padding: 6px 12px;
             border-radius: 4px;
             width: 100%;
-            max-width: 180px; /* 增加宽度从 120px 到 180px */
+            max-width: 180px;
+            /* 增加宽度从 120px 到 180px */
         }
 
         input:focus {
@@ -85,22 +102,22 @@
         }
     </style>
 </head>
+
 <body class="p-4 md:p-8">
     <div class="max-w-5xl mx-auto">
         <!-- Header -->
         <header class="mb-8 text-center">
-            <h1 class="text-4xl font-bold accent-blue mb-2 italic tracking-wider">ORION SEASON PLANNER</h1>
-            <p class="text-slate-400">2026 Q2 (4/8 - 6/30) 赛季进度管理</p>
+            <h1 class="text-4xl font-bold accent-blue mb-2 tracking-wider">ORION 赛季计划工具</h1>
+            <p class="text-slate-400">2026 Q2 (4/8 - 6/30)</p>
         </header>
 
         <!-- Main Input & Stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="ingress-card p-4 rounded-xl text-center total-input-box">
                 <div class="text-blue-400 text-sm font-bold mb-2 uppercase">输入游戏内当前总分</div>
-                <input type="number" id="global-total-actual" 
-                       class="text-2xl font-bold bg-transparent border-none text-center focus:ring-0 w-full" 
-                       placeholder="点击输入" value="0"
-                       onchange="updateGlobalTotal(this.value)">
+                <input type="number" id="global-total-actual"
+                    class="text-2xl font-bold bg-transparent border-none text-center focus:ring-0 w-full"
+                    placeholder="点击输入" value="0" onchange="updateGlobalTotal(this.value)">
                 <div class="text-[10px] text-slate-500 mt-1">Orion Season Tokens 统计值</div>
             </div>
             <div class="ingress-card p-4 rounded-xl text-center">
@@ -117,16 +134,41 @@
 
         <!-- Progress Bar -->
         <div class="ingress-card p-6 rounded-xl mb-8">
-            <div class="flex justify-between mb-4 text-xs font-semibold uppercase tracking-widest">
-                <span>Bronze (5k)</span>
-                <span>Silver (8k)</span>
-                <span>Gold (15k)</span>
-                <span>Platinum (25k)</span>
+            <div class="relative h-20 mb-4 font-semibold uppercase tracking-widest">
+                <!-- Bronze -->
+                <div class="absolute text-center transition-all duration-300"
+                    style="left: 20%; transform: translateX(-50%);">
+                    <img src="static/orion/bronze.png"
+                        class="w-10 h-10 mx-auto drop-shadow-[0_0_5px_rgba(205,127,50,0.5)]" alt="Bronze">
+                    <span class="text-[10px] whitespace-nowrap mt-1 block">Bronze (5k)</span>
+                </div>
+                <!-- Silver -->
+                <div class="absolute text-center transition-all duration-300"
+                    style="left: 32%; transform: translateX(-50%);">
+                    <img src="static/orion/silver.png"
+                        class="w-10 h-10 mx-auto drop-shadow-[0_0_5px_rgba(192,192,192,0.5)]" alt="Silver">
+                    <span class="text-[10px] whitespace-nowrap mt-1 block">Silver (8k)</span>
+                </div>
+                <!-- Gold -->
+                <div class="absolute text-center transition-all duration-300"
+                    style="left: 60%; transform: translateX(-50%);">
+                    <img src="static/orion/gold.png" class="w-10 h-10 mx-auto drop-shadow-[0_0_5px_rgba(255,215,0,0.5)]"
+                        alt="Gold">
+                    <span class="text-[10px] whitespace-nowrap mt-1 block">Gold (15k)</span>
+                </div>
+                <!-- Platinum -->
+                <div class="absolute text-center transition-all duration-300"
+                    style="left: 100%; transform: translateX(-100%);">
+                    <img src="static/orion/platinum.png"
+                        class="w-10 h-10 mx-auto drop-shadow-[0_0_5px_rgba(229,228,226,0.5)]" alt="Platinum">
+                    <span class="text-[10px] whitespace-nowrap mt-1 block">Platinum (25k)</span>
+                </div>
             </div>
             <div class="progress-bar-container">
-                <div class="badge-marker" style="left: 20%;"></div> 
-                <div class="badge-marker" style="left: 32%;"></div> 
-                <div class="badge-marker" style="left: 60%;"></div> 
+                <div class="badge-marker" style="left: 20%;"></div>
+                <div class="badge-marker" style="left: 32%;"></div>
+                <div class="badge-marker" style="left: 60%;"></div>
+                <div class="badge-marker" style="left: 100%;"></div>
                 <div id="main-progress-bar" class="progress-fill" style="width: 0%"></div>
             </div>
         </div>
@@ -220,7 +262,7 @@
                 const stored = userData.activities[act.id] || { planned: 0, actual: 0, lastUpdate: '-' };
                 const row = document.createElement('tr');
                 row.className = 'border-t border-slate-800 hover:bg-slate-800/30 transition-colors';
-                
+
                 let plannedInput = '';
                 let actualInput = '';
                 let hint = '';
@@ -230,7 +272,7 @@
                     actualInput = `
                         <div class="flex flex-col">
                             <span class="text-green-400 font-mono font-bold text-lg">${calculatedBounty}</span>
-                            <div class="text-[10px] text-slate-500 mt-1">约完成 ${Math.floor(calculatedBounty/80)} 天</div>
+                            <div class="text-[10px] text-slate-500 mt-1">约完成 ${Math.floor(calculatedBounty / 80)} 天</div>
                         </div>
                     `;
                     hint = `<div class="bounty-hint">明天起至季末最高还可得: ${potential} tokens</div>`;
@@ -262,21 +304,21 @@
             });
         }
 
-        window.updateGlobalTotal = function(val) {
+        window.updateGlobalTotal = function (val) {
             userData.globalTotal = parseInt(val) || 0;
             saveAndRefresh();
         }
 
-        window.updateValue = function(id, type, value) {
+        window.updateValue = function (id, type, value) {
             if (!userData.activities[id]) {
                 userData.activities[id] = { planned: 0, actual: 0, lastUpdate: '-' };
             }
-            
+
             userData.activities[id][type] = parseInt(value) || 0;
-            
+
             const now = new Date();
             userData.activities[id].lastUpdate = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
+
             saveAndRefresh();
         };
 
@@ -297,9 +339,9 @@
             });
 
             const potential = getRemainingBountyPotential();
-            
+
             let otherActualSum = 0;
-            ACTIVITIES.forEach(act => { if(!act.isBounty) otherActualSum += (userData.activities[act.id]?.actual || 0); });
+            ACTIVITIES.forEach(act => { if (!act.isBounty) otherActualSum += (userData.activities[act.id]?.actual || 0); });
             const currentBountyActual = Math.max(0, totalActual - otherActualSum);
 
             const plannedMin = otherPlannedSum + currentBountyActual;
@@ -321,7 +363,7 @@
             }
 
             let plannedTierMax = [...TIERS].reverse().find(t => t.value <= plannedMax);
-            document.getElementById('planned-status').innerText = plannedTierMax ? `最高预计可获 ${plannedTierMax.name} 级` : '预计不足以获得勋章';
+            document.getElementById('planned-status').innerText = plannedTierMax ? `最高预计可获 ${plannedTierMax.name} 勋章` : '预计不足以获得勋章';
 
             const progressPercent = Math.min((totalActual / 25000) * 100, 100);
             document.getElementById('main-progress-bar').style.width = progressPercent + '%';
@@ -330,4 +372,5 @@
         init();
     </script>
 </body>
+
 </html>
