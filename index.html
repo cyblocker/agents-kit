@@ -215,11 +215,11 @@
             { id: 'ifs_apr', name: 'IFS - 四月', desc: '4/4 现场活动', max: 2500, unit: 'tokens' },
             { id: 'ifs_may', name: 'IFS - 五月', desc: '5/2 现场活动', max: 2500, unit: 'tokens' },
             { id: 'ifs_jun', name: 'IFS - 六月', desc: '6/6 现场活动', max: 2500, unit: 'tokens' },
-            { id: 'op_sakura', name: 'Dispatch: 樱花祭', desc: '4/8 - 5/1 任务', max: 3000, unit: 'tokens' },
-            { id: 'op_global', name: 'Orion 全球行动', desc: '4/25 - 5/12 任务', max: 7500, unit: 'tokens' },
+            { id: 'op_sakura', name: 'Dispatch: 樱花祭', utcStart: '2026-04-07T18:00:00Z', utcEnd: '2026-04-30T18:00:00Z', max: 3000, unit: 'tokens' },
+            { id: 'op_global', name: 'Orion 全球行动', utcStart: '2026-04-24T18:00:00Z', utcEnd: '2026-05-11T18:00:00Z', max: 7500, unit: 'tokens' },
             { id: 'op_may_late', name: 'Dispatch: 五月下旬', max: 3000, unit: 'tokens' },
             { id: 'op_solstice', name: 'Dispatch: 夏至', max: 3000, unit: 'tokens' },
-            { id: 'anomaly', name: 'Anomaly 现场行动', desc: '现场完成全部任务', max: 5000, unit: 'tokens' }
+            { id: 'anomaly', name: 'Anomaly 现场行动', desc: '单站最高 5000 tokens，最多可参加 6 站', max: 30000, unit: 'tokens' }
         ];
 
         let userData = JSON.parse(localStorage.getItem('ingress_orion_planner_v3')) || {
@@ -267,6 +267,14 @@
                 let actualInput = '';
                 let hint = '';
 
+                let displayDesc = act.desc || '';
+                if (act.utcStart && act.utcEnd) {
+                    const start = new Date(act.utcStart);
+                    const end = new Date(act.utcEnd);
+                    const fmt = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+                    displayDesc = `${start.toLocaleString([], fmt)} - ${end.toLocaleString([], fmt)} (本地时间)`;
+                }
+
                 if (act.isBounty) {
                     plannedInput = `<span class="text-slate-600 italic text-sm">请见最终得分区间</span>`;
                     actualInput = `
@@ -290,7 +298,7 @@
                 row.innerHTML = `
                     <td class="p-4">
                         <div class="font-semibold text-slate-200">${act.name}</div>
-                        <div class="text-xs text-slate-500">${act.desc || ''}</div>
+                        <div class="text-xs text-slate-500">${displayDesc}</div>
                         ${hint}
                     </td>
                     <td class="p-4 text-slate-400 font-mono">${act.max}</td>
