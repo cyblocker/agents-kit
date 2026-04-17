@@ -129,6 +129,36 @@
             color: #60a5fa;
             text-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
         }
+
+        /* Responsive Fixes */
+        @media (max-width: 640px) {
+            .badge-label-container {
+                height: 120px !important;
+            }
+
+            .badge-item:nth-child(even) {
+                top: 60px !important;
+            }
+
+            .hide-on-mobile {
+                display: none;
+            }
+
+            input[type="number"] {
+                min-width: 70px;
+                padding: 4px 8px;
+                font-size: 0.875rem;
+            }
+
+            .total-input-box input[type="number"] {
+                min-width: 150px;
+                font-size: 1.5rem;
+            }
+
+            .progress-bar-container {
+                margin-top: 10px;
+            }
+        }
     </style>
 </head>
 
@@ -170,31 +200,31 @@
 
         <!-- Progress Bar -->
         <div class="ingress-card p-6 rounded-xl mb-8">
-            <div class="relative h-20 mb-4 font-semibold uppercase tracking-widest">
+            <div class="relative h-20 mb-4 font-semibold uppercase tracking-widest badge-label-container">
                 <!-- Bronze -->
-                <div class="absolute text-center transition-all duration-300"
-                    style="left: 20%; transform: translateX(-50%);">
+                <div class="absolute text-center transition-all duration-300 badge-item"
+                    style="left: 20%; transform: translateX(-50%); top: 0;">
                     <img src="static/orion/bronze.png"
                         class="w-10 h-10 mx-auto drop-shadow-[0_0_5px_rgba(205,127,50,0.5)]" alt="Bronze">
                     <span class="text-[10px] whitespace-nowrap mt-1 block">Bronze (5k)</span>
                 </div>
                 <!-- Silver -->
-                <div class="absolute text-center transition-all duration-300"
-                    style="left: 32%; transform: translateX(-50%);">
+                <div class="absolute text-center transition-all duration-300 badge-item"
+                    style="left: 32%; transform: translateX(-50%); top: 0;">
                     <img src="static/orion/silver.png"
                         class="w-10 h-10 mx-auto drop-shadow-[0_0_5px_rgba(192,192,192,0.5)]" alt="Silver">
                     <span class="text-[10px] whitespace-nowrap mt-1 block">Silver (8k)</span>
                 </div>
                 <!-- Gold -->
-                <div class="absolute text-center transition-all duration-300"
-                    style="left: 60%; transform: translateX(-50%);">
+                <div class="absolute text-center transition-all duration-300 badge-item"
+                    style="left: 60%; transform: translateX(-50%); top: 0;">
                     <img src="static/orion/gold.png" class="w-10 h-10 mx-auto drop-shadow-[0_0_5px_rgba(255,215,0,0.5)]"
                         alt="Gold">
                     <span class="text-[10px] whitespace-nowrap mt-1 block">Gold (15k)</span>
                 </div>
                 <!-- Platinum -->
-                <div class="absolute text-center transition-all duration-300"
-                    style="left: 100%; transform: translateX(-100%);">
+                <div class="absolute text-center transition-all duration-300 badge-item"
+                    style="left: 100%; transform: translateX(-100%); top: 0;">
                     <img src="static/orion/platinum.png"
                         class="w-10 h-10 mx-auto drop-shadow-[0_0_5px_rgba(229,228,226,0.5)]" alt="Platinum">
                     <span class="text-[10px] whitespace-nowrap mt-1 block">Platinum (25k)</span>
@@ -215,11 +245,11 @@
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-slate-800/50">
                         <tr>
-                            <th id="th-activity" class="p-4 text-sm font-semibold text-slate-300 min-w-[200px]"></th>
+                            <th id="th-activity" class="p-4 text-sm font-semibold text-slate-300 min-w-[140px]"></th>
                             <th id="th-max" class="p-4 text-sm font-semibold text-slate-300"></th>
                             <th id="th-planned" class="p-4 text-sm font-semibold text-slate-300"></th>
                             <th id="th-actual" class="p-4 text-sm font-semibold text-slate-300"></th>
-                            <th id="th-updated" class="p-4 text-sm font-semibold text-slate-300"></th>
+                            <th id="th-updated" class="p-4 text-sm font-semibold text-slate-300 hide-on-mobile"></th>
                         </tr>
                     </thead>
                     <tbody id="activity-body">
@@ -530,14 +560,14 @@
 
                 row.innerHTML = `
                     <td class="p-4">
-                        <div class="font-semibold text-slate-200">${t(act.nameKey)}</div>
-                        <div class="text-xs text-slate-500">${displayDesc}</div>
+                        <div class="font-semibold text-slate-200 text-sm sm:text-base">${t(act.nameKey)}</div>
+                        <div class="text-[10px] sm:text-xs text-slate-500">${displayDesc}</div>
                         ${hint}
                     </td>
-                    <td class="p-4 text-slate-400 font-mono">${act.max}</td>
+                    <td class="p-4 text-slate-400 font-mono text-xs sm:text-sm">${act.max}</td>
                     <td class="p-4">${plannedInput}</td>
                     <td class="p-4">${actualInput}</td>
-                    <td class="p-4">
+                    <td class="p-4 hide-on-mobile">
                         <div id="time-${act.id}" class="timestamp font-mono">${stored.lastUpdate}</div>
                     </td>
                 `;
