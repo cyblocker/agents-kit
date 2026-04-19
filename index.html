@@ -276,6 +276,10 @@
         <footer class="text-center text-slate-500 text-sm mb-12">
             <p id="footer-source"></p>
             <p id="footer-formula" class="mt-2 opacity-50"></p>
+            <div class="mt-6 pt-6 border-t border-slate-800/40 max-w-xs mx-auto">
+                <span id="label-contact"></span>
+                <a id="email-link" href="#" class="accent-blue hover:underline font-mono ml-1"></a>
+            </div>
         </footer>
     </div>
     <script>
@@ -306,6 +310,7 @@
                 maxTierForecast: (name) => `最高预计可获 ${name} 勋章`,
                 noTierForecast: '预计不足以获得勋章',
                 localTime: '本地时间',
+                contactMe: '联系我：',
                 // Activity names
                 act_bounties: '每日任务 (Daily Bounties)',
                 act_ifs_apr: 'IFS - 四月',
@@ -348,6 +353,7 @@
                 maxTierForecast: (name) => `Projected max: ${name} Badge`,
                 noTierForecast: 'Not enough for any badge',
                 localTime: 'local time',
+                contactMe: 'Contact Me: ',
                 // Activity names
                 act_bounties: 'Daily Bounties',
                 act_ifs_apr: 'IFS - April',
@@ -390,6 +396,7 @@
                 maxTierForecast: (name) => `最大予想: ${name} バッジ`,
                 noTierForecast: 'バッジ獲得には不十分',
                 localTime: '現地時間',
+                contactMe: 'お問い合わせ：',
                 // Activity names
                 act_bounties: 'デイリーバウンティ',
                 act_ifs_apr: 'IFS - 4月',
@@ -491,6 +498,7 @@
             // Footer
             document.getElementById('footer-source').textContent = t('footerSource');
             document.getElementById('footer-formula').textContent = t('footerFormula');
+            document.getElementById('label-contact').textContent = t('contactMe');
 
             // Title tag
             const titleMap = { zh: 'Ingress Orion 赛季计划工具', en: 'Ingress Orion Season Planner', ja: 'Ingress Orion シーズンプランナー' };
@@ -515,8 +523,19 @@
 
         function init() {
             initLangToggle();
+            initContact();
             document.getElementById('global-total-actual').value = userData.globalTotal || 0;
             applyLanguage();
+        }
+
+        function initContact() {
+            const el = document.getElementById('email-link');
+            if (!el) return;
+            // Obfuscated email to prevent simple scrapers
+            const parts = [105, 110, 103, 114, 101, 115, 115, 64, 99, 121, 98, 108, 111, 99, 107, 101, 114, 46, 99, 111, 109];
+            const email = parts.map(c => String.fromCharCode(c)).join('');
+            el.href = 'mailto:' + email;
+            el.textContent = email;
         }
 
         function renderTable() {
