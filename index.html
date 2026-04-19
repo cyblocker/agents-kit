@@ -327,7 +327,8 @@
                 desc_ifs_apr: '4/4 现场活动',
                 desc_ifs_may: '5/2 现场活动',
                 desc_ifs_jun: '6/6 现场活动',
-                desc_anomaly: '单站最高 5000 tokens，最多可参加 6 站',
+                desc_anomaly: '单站最高 5000 tokens',
+                max_anomaly: '5000 x 场次',
             },
             en: {
                 pageTitle: 'ORION SEASON PLANNER',
@@ -370,7 +371,8 @@
                 desc_ifs_apr: 'Apr 4 on-site event',
                 desc_ifs_may: 'May 2 on-site event',
                 desc_ifs_jun: 'Jun 6 on-site event',
-                desc_anomaly: 'Up to 5000 tokens per site, max 6 sites',
+                desc_anomaly: 'Up to 5000 tokens per site',
+                max_anomaly: '5000 x #sites',
             },
             ja: {
                 pageTitle: 'ORION シーズンプランナー',
@@ -413,7 +415,8 @@
                 desc_ifs_apr: '4/4 現地イベント',
                 desc_ifs_may: '5/2 現地イベント',
                 desc_ifs_jun: '6/6 現地イベント',
-                desc_anomaly: '1サイト最大 5000 tokens、最大6サイト参加可',
+                desc_anomaly: '1サイト最大 5000 tokens',
+                max_anomaly: '5000 x サイト数',
             }
         };
 
@@ -591,13 +594,15 @@
                     `;
                 }
 
+                const displayMax = (act.id === 'anomaly') ? t('max_anomaly') : act.max;
+
                 row.innerHTML = `
                     <td class="p-4">
                         <div class="font-semibold text-slate-200 text-sm sm:text-base">${t(act.nameKey)}</div>
                         <div class="text-[10px] sm:text-xs text-slate-500">${displayDesc}</div>
                         ${hint}
                     </td>
-                    <td class="p-4 text-slate-400 font-mono text-xs sm:text-sm">${act.max}</td>
+                    <td class="p-4 text-slate-400 font-mono text-xs sm:text-sm">${displayMax}</td>
                     <td class="p-4">${plannedInput}</td>
                     <td class="p-4">${actualInput}</td>
                     <td class="p-4 hide-on-mobile">
