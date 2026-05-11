@@ -278,7 +278,7 @@
                 <div id="label-input-total" class="text-blue-400 text-sm font-bold mb-2 uppercase"></div>
                 <input type="number" id="global-total-actual"
                     class="text-2xl font-bold bg-transparent border-none text-center focus:ring-0 w-full" placeholder=""
-                    value="0" onchange="updateGlobalTotal(this.value)">
+                    value="0" oninput="updateGlobalTotal(this.value)" onchange="updateGlobalTotal(this.value)">
                 <div id="label-input-hint" class="text-[10px] text-slate-500 mt-1"></div>
             </div>
             <div class="ingress-card p-4 rounded-xl text-center">
@@ -811,7 +811,7 @@
                 }
             });
 
-            const calculatedBounty = Math.max(0, userData.globalTotal - otherActualSum);
+            const calculatedBounty = Math.max(0, (userData.globalTotal || 0) - otherActualSum);
 
             ACTIVITIES.forEach(act => {
                 const stored = userData.activities[act.id] || { planned: 0, actual: 0, lastUpdate: '-' };
@@ -909,7 +909,7 @@
         }
 
         function calculate() {
-            let totalActual = userData.globalTotal;
+            let totalActual = userData.globalTotal || 0;
             let otherPlannedSum = 0;
 
             ACTIVITIES.forEach(act => {
