@@ -17,6 +17,7 @@
         })(window, document, 'script', 'dataLayer', 'GTM-KL22WN');</script>
     <!-- End Google Tag Manager -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap');
 
@@ -170,6 +171,81 @@
                 margin-top: 10px;
             }
         }
+
+        /* QR Code Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: #0f172a;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #1e293b;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        #qrcode img {
+            border: 8px solid white;
+            border-radius: 4px;
+        }
+
+        .share-url-box {
+            background: #060a0f;
+            border: 1px solid #334155;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            word-break: break-all;
+            margin-bottom: 15px;
+            color: #94a3b8;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-outline {
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            border-color: #60a5fa;
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+        }
     </style>
 </head>
 
@@ -274,6 +350,51 @@
             </div>
         </div>
 
+        <!-- Data Migration -->
+        <div class="ingress-card p-6 rounded-xl mb-8">
+            <h2 id="label-migration" class="text-lg font-bold accent-blue mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                <span id="text-migration"></span>
+            </h2>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="showShareModal()" class="btn-primary flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    <span id="btn-share-url"></span>
+                </button>
+                <button onclick="exportDataToFile()" class="btn-outline flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span id="btn-export-json"></span>
+                </button>
+                <label class="btn-outline flex items-center cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span id="btn-import-json"></span>
+                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="importDataFromFile(event)">
+                </label>
+            </div>
+        </div>
+
+        <!-- Share Modal -->
+        <div id="shareModal" class="modal">
+            <div class="modal-content ingress-card">
+                <h3 id="modal-share-title" class="text-xl font-bold accent-blue mb-2"></h3>
+                <p id="modal-share-desc" class="text-slate-400 text-sm mb-4"></p>
+                <div id="qrcode"></div>
+                <div id="share-url" class="share-url-box"></div>
+                <div class="flex gap-2 justify-center">
+                    <button onclick="copyShareUrl()" id="btn-copy-url" class="btn-primary text-sm"></button>
+                    <button onclick="closeShareModal()" id="btn-close-modal" class="btn-outline text-sm"></button>
+                </div>
+            </div>
+        </div>
+
         <footer class="text-center text-slate-500 text-sm mb-12">
             <p id="footer-source"></p>
             <p id="footer-formula" class="mt-2 opacity-50"></p>
@@ -312,6 +433,19 @@
                 noTierForecast: '预计不足以获得勋章',
                 localTime: '本地时间',
                 contactMe: '联系我：',
+                // Data Migration
+                textMigration: '数据迁移',
+                btnShareUrl: '分享链接 & 二维码',
+                btnExportJson: '导出 JSON 文件',
+                btnImportJson: '导入 JSON 文件',
+                modalShareTitle: '数据分享',
+                modalShareDesc: '扫码或复制链接在其他设备上同步您的计划。',
+                btnClose: '关闭',
+                btnCopy: '复制链接',
+                copySuccess: '链接已复制到剪贴板',
+                syncConfirm: '检测到同步数据，是否覆盖本地记录？',
+                importSuccess: '导入成功！',
+                invalidData: '无效的数据格式！',
                 // Activity names
                 act_bounties: '每日任务 (Daily Bounties)',
                 act_ifs_apr: 'IFS - 四月',
@@ -357,6 +491,19 @@
                 noTierForecast: 'Not enough for any badge',
                 localTime: 'local time',
                 contactMe: 'Contact Me: ',
+                // Data Migration
+                textMigration: 'Data Migration',
+                btnShareUrl: 'Share Link & QR',
+                btnExportJson: 'Export JSON',
+                btnImportJson: 'Import JSON',
+                modalShareTitle: 'Share Data',
+                modalShareDesc: 'Scan the QR or copy the link to sync your plan on other devices.',
+                btnClose: 'Close',
+                btnCopy: 'Copy Link',
+                copySuccess: 'Link copied to clipboard',
+                syncConfirm: 'Sync data detected. Overwrite local records?',
+                importSuccess: 'Import successful!',
+                invalidData: 'Invalid data format!',
                 // Activity names
                 act_bounties: 'Daily Bounties',
                 act_ifs_apr: 'IFS - April',
@@ -402,6 +549,19 @@
                 noTierForecast: 'バッジ獲得には不十分',
                 localTime: '現地時間',
                 contactMe: 'お問い合わせ：',
+                // Data Migration
+                textMigration: 'データ移行',
+                btnShareUrl: '共有リンクとQR',
+                btnExportJson: 'JSON書き出し',
+                btnImportJson: 'JSON読み込み',
+                modalShareTitle: 'データ共有',
+                modalShareDesc: 'QRコードを読み取るか、リンクをコピーして他のデバイスと同期します。',
+                btnClose: '閉じる',
+                btnCopy: 'リンクをコピー',
+                copySuccess: 'リンクをコピーしました',
+                syncConfirm: '同期データを検出しました。ローカル記録を上書きしますか？',
+                importSuccess: 'インポート成功！',
+                invalidData: '無効なデータ形式です！',
                 // Activity names
                 act_bounties: 'デイリーバウンティ',
                 act_ifs_apr: 'IFS - 4月',
@@ -508,6 +668,16 @@
             document.getElementById('footer-formula').textContent = t('footerFormula');
             document.getElementById('label-contact').textContent = t('contactMe');
 
+            // Data Migration
+            document.getElementById('text-migration').textContent = t('textMigration');
+            document.getElementById('btn-share-url').textContent = t('btnShareUrl');
+            document.getElementById('btn-export-json').textContent = t('btnExportJson');
+            document.getElementById('btn-import-json').textContent = t('btnImportJson');
+            document.getElementById('modal-share-title').textContent = t('modalShareTitle');
+            document.getElementById('modal-share-desc').textContent = t('modalShareDesc');
+            document.getElementById('btn-close-modal').textContent = t('btnClose');
+            document.getElementById('btn-copy-url').textContent = t('btnCopy');
+
             // Title tag
             const titleMap = { zh: 'Ingress Orion 赛季计划工具', en: 'Ingress Orion Season Planner', ja: 'Ingress Orion シーズンプランナー' };
             document.title = titleMap[currentLang] || titleMap.en;
@@ -532,6 +702,7 @@
         function init() {
             initLangToggle();
             initContact();
+            checkHashData();
             document.getElementById('global-total-actual').value = userData.globalTotal || 0;
             applyLanguage();
         }
@@ -680,6 +851,119 @@
 
             const progressPercent = Math.min((totalActual / 25000) * 100, 100);
             document.getElementById('main-progress-bar').style.width = progressPercent + '%';
+        }
+
+        // ==================== MIGRATION LOGIC ====================
+        let qrcode = null;
+
+        function showShareModal() {
+            const data = {
+                v: 3,
+                lang: currentLang,
+                planner: userData
+            };
+            const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+            const url = window.location.origin + window.location.pathname + '#data=' + base64Data;
+            
+            document.getElementById('share-url').textContent = url;
+            document.getElementById('shareModal').style.display = 'block';
+
+            if (qrcode) {
+                qrcode.clear();
+                qrcode.makeCode(url);
+            } else {
+                qrcode = new QRCode(document.getElementById("qrcode"), {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
+        }
+
+        function copyShareUrl() {
+            const url = document.getElementById('share-url').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                alert(t('copySuccess'));
+            });
+        }
+
+        function exportDataToFile() {
+            const data = {
+                v: 3,
+                lang: currentLang,
+                planner: userData
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ingress_orion_data_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importDataFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    processImport(data);
+                } catch (err) {
+                    alert(t('invalidData'));
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input
+        }
+
+        function checkHashData() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#data=')) {
+                const base64Data = hash.substring(6);
+                try {
+                    const jsonStr = decodeURIComponent(escape(atob(base64Data)));
+                    const data = JSON.parse(jsonStr);
+                    
+                    // Clear hash to avoid repeated prompts on refresh
+                    window.history.replaceState(null, null, window.location.pathname);
+                    
+                    if (confirm(t('syncConfirm'))) {
+                        processImport(data);
+                    }
+                } catch (err) {
+                    console.error('Failed to parse hash data', err);
+                }
+            }
+        }
+
+        function processImport(data) {
+            if (data && data.planner) {
+                userData = data.planner;
+                if (data.lang && I18N[data.lang]) {
+                    currentLang = data.lang;
+                    localStorage.setItem('ingress_orion_lang', currentLang);
+                }
+                localStorage.setItem('ingress_orion_planner_v3', JSON.stringify(userData));
+                
+                // Update UI
+                document.getElementById('global-total-actual').value = userData.globalTotal || 0;
+                applyLanguage();
+                alert(t('importSuccess'));
+            } else {
+                alert(t('invalidData'));
+            }
         }
 
         init();
