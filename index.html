@@ -18,6 +18,7 @@
     <!-- End Google Tag Manager -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap');
 
@@ -455,6 +456,8 @@
                 syncConfirm: '检测到同步数据，是否覆盖本地记录？',
                 importSuccess: '导入成功！',
                 invalidData: '无效的数据格式！',
+                wrongSeason: (s) => `此数据属于其他赛季 (${s})，是否仍要导入？`,
+                confirmMergeAllSeasons: '检测到多赛季全量数据，是否覆盖本地所有赛季记录？',
                 // Countdown
                 startsIn: (t) => `${t} 后开始`,
                 endsIn: (t) => `${t} 后结束`,
@@ -520,6 +523,8 @@
                 syncConfirm: 'Sync data detected. Overwrite local records?',
                 importSuccess: 'Import successful!',
                 invalidData: 'Invalid data format!',
+                wrongSeason: (s) => `This data belongs to another season (${s}). Import anyway?`,
+                confirmMergeAllSeasons: 'Multi-season data detected. Overwrite all local season records?',
                 // Countdown
                 startsIn: (t) => `Starts in ${t}`,
                 endsIn: (t) => `Ends in ${t}`,
@@ -585,6 +590,8 @@
                 syncConfirm: '同期データを検出しました。ローカル記録を上書きしますか？',
                 importSuccess: 'インポート成功！',
                 invalidData: '無効なデータ形式です！',
+                wrongSeason: (s) => `このデータは別のシーズン (${s}) のものです。インポートしますか？`,
+                confirmMergeAllSeasons: '複数シーズンのデータを検出しました。ローカルの全記録を上書きしますか？',
                 // Countdown
                 startsIn: (t) => `あと ${t} で開始`,
                 endsIn: (t) => `あと ${t} で終了`,
@@ -648,6 +655,9 @@
         }
 
         // ==================== DATA ====================
+        const CURRENT_SEASON_ID = '2026_q2_orion';
+        const GLOBAL_STORAGE_KEY = 'ingress_planner_all_seasons';
+
         const TIERS = [
             { name: 'Bronze', value: 5000 },
             { name: 'Silver', value: 8000 },
@@ -670,10 +680,33 @@
             { id: 'anomaly', nameKey: 'act_anomaly', descKey: 'desc_anomaly', max: 30000, unit: 'tokens' }
         ];
 
-        let userData = JSON.parse(localStorage.getItem('ingress_orion_planner_v3')) || {
-            globalTotal: 0,
-            activities: {}
-        };
+        let allSeasonsData = {};
+        let userData = {};
+
+        function loadAllSeasonsData() {
+            const saved = localStorage.getItem(GLOBAL_STORAGE_KEY);
+            if (saved) {
+                allSeasonsData = JSON.parse(saved);
+            } else {
+                // Migration logic chain
+                const seasonKey = 'ingress_planner_data_' + CURRENT_SEASON_ID;
+                const legacyKey = 'ingress_orion_planner_v3';
+                
+                const migratedData = localStorage.getItem(seasonKey) || localStorage.getItem(legacyKey);
+                if (migratedData) {
+                    allSeasonsData[CURRENT_SEASON_ID] = JSON.parse(migratedData);
+                    localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
+                }
+            }
+
+            // Set current working data
+            if (!allSeasonsData[CURRENT_SEASON_ID]) {
+                allSeasonsData[CURRENT_SEASON_ID] = { globalTotal: 0, activities: {} };
+            }
+            userData = allSeasonsData[CURRENT_SEASON_ID];
+        }
+
+        loadAllSeasonsData();
 
         // ==================== LANGUAGE TOGGLE ====================
         function initLangToggle() {
@@ -866,7 +899,8 @@
         };
 
         function saveAndRefresh() {
-            localStorage.setItem('ingress_orion_planner_v3', JSON.stringify(userData));
+            allSeasonsData[CURRENT_SEASON_ID] = userData;
+            localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
             renderTable();
             calculate();
         }
@@ -929,12 +963,14 @@
 
         function showShareModal() {
             const data = {
-                v: 3,
+                v: 4,
+                currentSeasonId: CURRENT_SEASON_ID,
                 lang: currentLang,
-                planner: userData
+                allSeasons: allSeasonsData
             };
-            const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-            const url = window.location.origin + window.location.pathname + '#data=' + base64Data;
+            const jsonStr = JSON.stringify(data);
+            const compressedData = LZString.compressToEncodedURIComponent(jsonStr);
+            const url = window.location.origin + window.location.pathname + '#data=' + compressedData;
 
             document.getElementById('share-url').textContent = url;
             document.getElementById('shareModal').style.display = 'block';
@@ -967,15 +1003,16 @@
 
         function exportDataToFile() {
             const data = {
-                v: 3,
+                v: 4,
+                currentSeasonId: CURRENT_SEASON_ID,
                 lang: currentLang,
-                planner: userData
+                allSeasons: allSeasonsData
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ingress_orion_data_${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = `ingress_all_seasons_${new Date().toISOString().slice(0, 10)}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1002,16 +1039,28 @@
         function checkHashData() {
             const hash = window.location.hash;
             if (hash.startsWith('#data=')) {
-                const base64Data = hash.substring(6);
+                const dataStr = hash.substring(6);
                 try {
-                    const jsonStr = decodeURIComponent(escape(atob(base64Data)));
-                    const data = JSON.parse(jsonStr);
+                    let jsonStr = LZString.decompressFromEncodedURIComponent(dataStr);
+                    
+                    // Fallback for legacy Base64 data
+                    if (!jsonStr) {
+                        try {
+                            jsonStr = decodeURIComponent(escape(atob(dataStr)));
+                        } catch(e) {
+                            jsonStr = null;
+                        }
+                    }
 
-                    // Clear hash to avoid repeated prompts on refresh
-                    window.history.replaceState(null, null, window.location.pathname);
+                    if (jsonStr) {
+                        const data = JSON.parse(jsonStr);
 
-                    if (confirm(t('syncConfirm'))) {
-                        processImport(data);
+                        // Clear hash to avoid repeated prompts on refresh
+                        window.history.replaceState(null, null, window.location.pathname);
+
+                        if (confirm(t('syncConfirm'))) {
+                            processImport(data);
+                        }
                     }
                 } catch (err) {
                     console.error('Failed to parse hash data', err);
@@ -1020,13 +1069,28 @@
         }
 
         function processImport(data) {
-            if (data && data.planner) {
-                userData = data.planner;
+            if (data && (data.allSeasons || data.planner)) {
+                // Handle multi-season format (v4+)
+                if (data.allSeasons) {
+                    if (!confirm(t('confirmMergeAllSeasons'))) return;
+                    allSeasonsData = data.allSeasons;
+                } 
+                // Handle legacy single-season format
+                else if (data.planner) {
+                    const sid = data.seasonId || CURRENT_SEASON_ID;
+                    if (sid !== CURRENT_SEASON_ID) {
+                        if (!confirm(t('wrongSeason')(sid))) return;
+                    }
+                    allSeasonsData[sid] = data.planner;
+                }
+
                 if (data.lang && I18N[data.lang]) {
                     currentLang = data.lang;
                     localStorage.setItem('ingress_orion_lang', currentLang);
                 }
-                localStorage.setItem('ingress_orion_planner_v3', JSON.stringify(userData));
+                
+                localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
+                userData = allSeasonsData[CURRENT_SEASON_ID] || { globalTotal: 0, activities: {} };
 
                 // Update UI
                 document.getElementById('global-total-actual').value = userData.globalTotal || 0;
