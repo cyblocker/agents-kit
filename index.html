@@ -1075,7 +1075,6 @@
             if (data && (data.allSeasons || data.planner)) {
                 // Handle multi-season format (v4+)
                 if (data.allSeasons) {
-                    if (!confirm(t('confirmMergeAllSeasons'))) return;
                     allSeasonsData = data.allSeasons;
                 } 
                 // Handle legacy single-season format
