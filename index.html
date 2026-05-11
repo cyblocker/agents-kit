@@ -19,6 +19,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap');
 
@@ -250,6 +251,166 @@
             color: #60a5fa;
             background: rgba(96, 165, 250, 0.1);
         }
+
+        /* Card Template Styles */
+        #card-template {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 600px;
+            height: 1000px;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .theme-default {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .theme-res {
+            background: linear-gradient(135deg, #020617 0%, #1e3a8a 100%);
+            border: 2px solid #3b82f6;
+        }
+
+        .theme-enl {
+            background: linear-gradient(135deg, #022c22 0%, #14532d 100%);
+            border: 2px solid #22c55e;
+        }
+
+        .card-title {
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            color: #cbd5e1;
+        }
+
+        .card-title-l1 {
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .card-title-l2 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .card-agent {
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .theme-res .card-agent {
+            color: #60a5fa;
+            text-shadow: 0 0 20px rgba(96, 165, 250, 0.8);
+        }
+
+        .theme-enl .card-agent {
+            color: #4ade80;
+            text-shadow: 0 0 20px rgba(74, 222, 128, 0.8);
+        }
+
+        .card-badge {
+            width: 160px;
+            height: 160px;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+            object-fit: contain;
+        }
+
+        .card-score {
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            font-family: 'Exo 2', sans-serif;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .card-congrats {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fbbf24;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .card-stats {
+            width: 100%;
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-content: start;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .stat-pct {
+            display: block;
+            font-size: 16px;
+            color: #94a3b8;
+            margin-top: 4px;
+            font-weight: normal;
+        }
+
+        .card-footer {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: auto;
+            text-align: center;
+            letter-spacing: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card-footer-url {
+            font-size: 16px;
+            opacity: 1;
+            margin-top: 8px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #cbd5e1;
+        }
+
+        #card-preview-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 
@@ -333,89 +494,167 @@
                 <div id="main-progress-bar" class="progress-fill" style="width: 0%"></div>
             </div>
         </div>
+    </div>
 
-        <!-- Activity Table -->
-        <div class="ingress-card rounded-xl overflow-hidden mb-8">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-800/50">
-                        <tr>
-                            <th id="th-activity" class="p-4 text-sm font-semibold text-slate-300 min-w-[140px]"></th>
-                            <th id="th-max" class="p-4 text-sm font-semibold text-slate-300"></th>
-                            <th id="th-planned" class="p-4 text-sm font-semibold text-slate-300"></th>
-                            <th id="th-actual" class="p-4 text-sm font-semibold text-slate-300"></th>
-                            <th id="th-updated" class="p-4 text-sm font-semibold text-slate-300 hide-on-mobile"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="activity-body">
-                        <!-- Rows -->
-                    </tbody>
-                </table>
-            </div>
+    <!-- Card Generation -->
+    <div class="ingress-card p-6 rounded-xl mb-8">
+        <h2 id="label-card" class="text-lg font-bold accent-purple mb-2 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span id="text-card-module"></span>
+        </h2>
+        <p id="card-motivation" class="text-sm text-slate-400 mb-4"></p>
+        <div class="flex flex-col md:flex-row gap-4 items-center">
+            <input type="text" id="agent-name-input"
+                class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white w-full md:w-auto"
+                placeholder="Agent Name">
+            <select id="card-theme-select"
+                class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white w-full md:w-auto">
+                <option value="theme-default" id="opt-theme-default">Default (Dark)</option>
+                <option value="theme-res" id="opt-theme-res">Resistance (Blue)</option>
+                <option value="theme-enl" id="opt-theme-enl">Enlightened (Green)</option>
+            </select>
+            <button onclick="generateCard()" class="btn-primary w-full md:w-auto flex justify-center items-center"
+                id="btn-generate-card">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Generate</span>
+            </button>
         </div>
+    </div>
 
-        <!-- Data Migration -->
-        <div class="ingress-card p-6 rounded-xl mb-8">
-            <h2 id="label-migration" class="text-lg font-bold accent-blue mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+    <!-- Activity Table -->
+    <div class="ingress-card rounded-xl overflow-hidden mb-8">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-800/50">
+                    <tr>
+                        <th id="th-activity" class="p-4 text-sm font-semibold text-slate-300 min-w-[140px]"></th>
+                        <th id="th-max" class="p-4 text-sm font-semibold text-slate-300"></th>
+                        <th id="th-planned" class="p-4 text-sm font-semibold text-slate-300"></th>
+                        <th id="th-actual" class="p-4 text-sm font-semibold text-slate-300"></th>
+                        <th id="th-updated" class="p-4 text-sm font-semibold text-slate-300 hide-on-mobile"></th>
+                    </tr>
+                </thead>
+                <tbody id="activity-body">
+                    <!-- Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Data Migration -->
+    <div class="ingress-card p-6 rounded-xl mb-8">
+        <h2 id="label-migration" class="text-lg font-bold accent-blue mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+            <span id="text-migration"></span>
+        </h2>
+        <div class="flex flex-wrap gap-3">
+            <button onclick="showShareModal()" class="btn-primary flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
-                <span id="text-migration"></span>
-            </h2>
-            <div class="flex flex-wrap gap-3">
-                <button onclick="showShareModal()" class="btn-primary flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                    <span id="btn-share-url"></span>
-                </button>
-                <button onclick="exportDataToFile()" class="btn-outline flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    <span id="btn-export-json"></span>
-                </button>
-                <label class="btn-outline flex items-center cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    <span id="btn-import-json"></span>
-                    <input type="file" id="import-file" class="hidden" accept=".json"
-                        onchange="importDataFromFile(event)">
-                </label>
+                <span id="btn-share-url"></span>
+            </button>
+            <button onclick="exportDataToFile()" class="btn-outline flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span id="btn-export-json"></span>
+            </button>
+            <label class="btn-outline flex items-center cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span id="btn-import-json"></span>
+                <input type="file" id="import-file" class="hidden" accept=".json" onchange="importDataFromFile(event)">
+            </label>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content ingress-card">
+            <h3 id="modal-share-title" class="text-xl font-bold accent-blue mb-2"></h3>
+            <p id="modal-share-desc" class="text-slate-400 text-sm mb-4"></p>
+            <div id="qrcode"></div>
+            <div id="share-url" class="share-url-box"></div>
+            <div class="flex gap-2 justify-center">
+                <button onclick="copyShareUrl()" id="btn-copy-url" class="btn-primary text-sm"></button>
+                <button onclick="closeModal('shareModal')" id="btn-close-modal" class="btn-outline text-sm"></button>
             </div>
         </div>
+    </div>
 
-        <!-- Share Modal -->
-        <div id="shareModal" class="modal">
-            <div class="modal-content ingress-card">
-                <h3 id="modal-share-title" class="text-xl font-bold accent-blue mb-2"></h3>
-                <p id="modal-share-desc" class="text-slate-400 text-sm mb-4"></p>
-                <div id="qrcode"></div>
-                <div id="share-url" class="share-url-box"></div>
-                <div class="flex gap-2 justify-center">
-                    <button onclick="copyShareUrl()" id="btn-copy-url" class="btn-primary text-sm"></button>
-                    <button onclick="closeShareModal()" id="btn-close-modal" class="btn-outline text-sm"></button>
-                </div>
+    <!-- Card Modal -->
+    <div id="cardModal" class="modal">
+        <div class="modal-content ingress-card" style="max-width: 450px;">
+            <h3 id="modal-card-title" class="text-xl font-bold accent-purple mb-2"></h3>
+            <p id="modal-card-desc" class="text-slate-400 text-sm mb-4"></p>
+            <div id="card-preview-container" class="mb-6"></div>
+            <div class="flex gap-2 justify-center">
+                <button onclick="closeModal('cardModal')" id="btn-close-card" class="btn-outline text-sm"></button>
             </div>
         </div>
+    </div>
 
-        <footer class="text-center text-slate-500 text-sm mb-12">
-            <p id="footer-source"></p>
-            <p id="footer-formula" class="mt-2 opacity-50"></p>
-            <div class="mt-6 pt-6 border-t border-slate-800/40 max-w-xs mx-auto">
-                <span id="label-contact"></span>
-                <a id="email-link" href="#" class="accent-blue hover:underline font-mono ml-1"></a>
+    <!-- Hidden Card Template -->
+    <div id="card-template" class="theme-default">
+        <div class="card-title">
+            <div class="card-title-l1">Ingress 2026 Q2</div>
+            <div class="card-title-l2">Orion Anomaly Season</div>
+        </div>
+        <div class="card-agent" id="ct-agent">AGENT</div>
+        <div class="card-congrats" id="ct-congrats"></div>
+        <img src="" class="card-badge" id="ct-badge" style="display:none;">
+        <div class="card-score" id="ct-score">0</div>
+        <div class="card-stats">
+            <div class="stat-box">
+                <div class="stat-label" id="ctl-bounties">Bounties</div>
+                <div class="stat-value" id="ct-bounties">0</div>
             </div>
-        </footer>
+            <div class="stat-box">
+                <div class="stat-label" id="ctl-ifs">IFS</div>
+                <div class="stat-value" id="ct-ifs">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label" id="ctl-events">Events & Ops</div>
+                <div class="stat-value" id="ct-events">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label" id="ctl-anomaly">Anomaly</div>
+                <div class="stat-value" id="ct-anomaly">0</div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div>GENERATED BY ORION SEASON PLANNER</div>
+            <div class="card-footer-url">cyblocker.com/ingress</div>
+        </div>
+    </div>
+
+    <footer class="text-center text-slate-500 text-sm mb-12">
+        <p id="footer-source"></p>
+        <p id="footer-formula" class="mt-2 opacity-50"></p>
+        <div class="mt-6 pt-6 border-t border-slate-800/40 max-w-xs mx-auto">
+            <span id="label-contact"></span>
+            <a id="email-link" href="#" class="accent-blue hover:underline font-mono ml-1"></a>
+        </div>
+    </footer>
     </div>
     <script>
         // ==================== I18N ====================
@@ -461,6 +700,24 @@
                 invalidData: '无效的数据格式！',
                 wrongSeason: (s) => `此数据属于其他赛季 (${s})，是否仍要导入？`,
                 confirmMergeAllSeasons: '检测到多赛季全量数据，是否覆盖本地所有赛季记录？',
+                // Card Generation
+                textCardModule: '赛季纪念卡片',
+                agentPlaceholder: '特工代号 (Agent Name)',
+                optThemeDefault: '默认 (深色)',
+                optThemeRes: '抵抗军 (蓝色)',
+                optThemeEnl: '启蒙军 (绿色)',
+                btnGenerateCard: '生成纪念卡片',
+                modalCardTitle: '保存纪念卡片',
+                modalCardDesc: '生成完成！电脑上可右键另存为，手机上长按下方图片保存到相册，或分享给朋友。',
+                statBounties: '每日任务',
+                statIFS: 'IFS (First Saturday)',
+                statEvents: '现场活动与行动',
+                statAnomaly: 'Anomaly 现场',
+                pctComplete: (p) => `目标完成 ${p}%`,
+                bountyComplete: (p) => `完成 ${p}%`,
+                congratsCardMsg: (t) => `获得 ${t} 奖牌！`,
+                motivationBadge: (t) => `恭喜您已达成 ${t} 奖牌，快来生成纪念卡片分享一下吧！`,
+                motivationNormal: '赛季即将结束，来生成一张专属您的赛季成绩卡片吧！',
                 // Countdown
                 startsIn: (t) => `${t} 后开始`,
                 endsIn: (t) => `${t} 后结束`,
@@ -528,6 +785,24 @@
                 invalidData: 'Invalid data format!',
                 wrongSeason: (s) => `This data belongs to another season (${s}). Import anyway?`,
                 confirmMergeAllSeasons: 'Multi-season data detected. Overwrite all local season records?',
+                // Card Generation
+                textCardModule: 'Commemorative Card',
+                agentPlaceholder: 'Agent Name',
+                optThemeDefault: 'Default (Dark)',
+                optThemeRes: 'Resistance (Blue)',
+                optThemeEnl: 'Enlightened (Green)',
+                btnGenerateCard: 'Generate Card',
+                modalCardTitle: 'Save Commemorative Card',
+                modalCardDesc: 'Card generated! Right-click to save on PC, or long-press the image on mobile devices.',
+                statBounties: 'Bounties',
+                statIFS: 'IFS (First Saturday)',
+                statEvents: 'Events & Ops',
+                statAnomaly: 'Anomaly',
+                pctComplete: (p) => `${p}% of Target`,
+                bountyComplete: (p) => `${p}% Complete`,
+                congratsCardMsg: (t) => `${t} Badge Earned!`,
+                motivationBadge: (t) => `Congratulations on reaching the ${t} badge! Generate a card to share it!`,
+                motivationNormal: 'The season is coming to a close. Generate your personalized commemorative card!',
                 // Countdown
                 startsIn: (t) => `Starts in ${t}`,
                 endsIn: (t) => `Ends in ${t}`,
@@ -595,6 +870,24 @@
                 invalidData: '無効なデータ形式です！',
                 wrongSeason: (s) => `このデータは別のシーズン (${s}) のものです。インポートしますか？`,
                 confirmMergeAllSeasons: '複数シーズンのデータを検出しました。ローカルの全記録を上書きしますか？',
+                // Card Generation
+                textCardModule: '記念カード生成',
+                agentPlaceholder: 'エージェント名 (AG)',
+                optThemeDefault: 'デフォルト (ダーク)',
+                optThemeRes: 'レジスタンス (青)',
+                optThemeEnl: 'エンライテンド (緑)',
+                btnGenerateCard: 'カードを生成',
+                modalCardTitle: '記念カードを保存',
+                modalCardDesc: '生成完了！PCでは右クリック、スマートフォンでは画像を長押しして保存してください。',
+                statBounties: 'デイリーバウンティ',
+                statIFS: 'IFS (First Saturday)',
+                statEvents: 'イベント & OP',
+                statAnomaly: 'アノマリー',
+                pctComplete: (p) => `計画達成率 ${p}%`,
+                bountyComplete: (p) => `達成率 ${p}%`,
+                congratsCardMsg: (t) => `${t} メダル獲得！`,
+                motivationBadge: (t) => `${t} メダル獲得おめでとうございます！記念カードを生成してシェアしましょう！`,
+                motivationNormal: 'シーズンが終了に近づいています。あなただけの記念カードを作りましょう！',
                 // Countdown
                 startsIn: (t) => `あと ${t} で開始`,
                 endsIn: (t) => `あと ${t} で終了`,
@@ -694,7 +987,7 @@
                 // Migration logic chain
                 const seasonKey = 'ingress_planner_data_' + CURRENT_SEASON_ID;
                 const legacyKey = 'ingress_orion_planner_v3';
-                
+
                 const migratedData = localStorage.getItem(seasonKey) || localStorage.getItem(legacyKey);
                 if (migratedData) {
                     allSeasonsData[CURRENT_SEASON_ID] = JSON.parse(migratedData);
@@ -750,7 +1043,7 @@
             document.getElementById('footer-formula').textContent = t('footerFormula');
             document.getElementById('label-contact').textContent = t('contactMe');
 
-            // Data Migration
+            // Data Migration & Card UI
             document.getElementById('text-migration').textContent = t('textMigration');
             document.getElementById('btn-share-url').textContent = t('btnShareUrl');
             document.getElementById('btn-export-json').textContent = t('btnExportJson');
@@ -759,6 +1052,22 @@
             document.getElementById('modal-share-desc').textContent = t('modalShareDesc');
             document.getElementById('btn-close-modal').textContent = t('btnClose');
             document.getElementById('btn-copy-url').textContent = t('btnCopy');
+
+            document.getElementById('text-card-module').textContent = t('textCardModule');
+            document.getElementById('agent-name-input').placeholder = t('agentPlaceholder');
+            document.getElementById('opt-theme-default').textContent = t('optThemeDefault');
+            document.getElementById('opt-theme-res').textContent = t('optThemeRes');
+            document.getElementById('opt-theme-enl').textContent = t('optThemeEnl');
+            document.getElementById('btn-generate-card').querySelector('span').textContent = t('btnGenerateCard');
+
+            document.getElementById('modal-card-title').textContent = t('modalCardTitle');
+            document.getElementById('modal-card-desc').textContent = t('modalCardDesc');
+            document.getElementById('btn-close-card').textContent = t('btnClose');
+
+            document.getElementById('ctl-bounties').textContent = t('statBounties');
+            document.getElementById('ctl-ifs').textContent = t('statIFS');
+            document.getElementById('ctl-events').textContent = t('statEvents');
+            document.getElementById('ctl-anomaly').textContent = t('statAnomaly');
 
             // Title tag
             const titleMap = { zh: 'Ingress Orion 赛季计划工具', en: 'Ingress Orion Season Planner', ja: 'Ingress Orion シーズンプランナー' };
@@ -959,6 +1268,14 @@
 
             const progressPercent = Math.min((totalActual / 25000) * 100, 100);
             document.getElementById('main-progress-bar').style.width = progressPercent + '%';
+
+            // Motivation Message for Card
+            let earnedTier = [...TIERS].reverse().find(t => totalActual >= t.value);
+            if (earnedTier) {
+                document.getElementById('card-motivation').innerHTML = t('motivationBadge')(earnedTier.name) + ' 🎉';
+            } else {
+                document.getElementById('card-motivation').innerHTML = t('motivationNormal');
+            }
         }
 
         // ==================== MIGRATION LOGIC ====================
@@ -993,8 +1310,8 @@
             }
         }
 
-        function closeShareModal() {
-            document.getElementById('shareModal').style.display = 'none';
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
         }
 
         function copyShareUrl() {
@@ -1045,12 +1362,12 @@
                 const dataStr = hash.substring(6);
                 try {
                     let jsonStr = LZString.decompressFromEncodedURIComponent(dataStr);
-                    
+
                     // Fallback for legacy Base64 data
                     if (!jsonStr) {
                         try {
                             jsonStr = decodeURIComponent(escape(atob(dataStr)));
-                        } catch(e) {
+                        } catch (e) {
                             jsonStr = null;
                         }
                     }
@@ -1071,12 +1388,118 @@
             }
         }
 
+        // ==================== CARD GENERATION ====================
+        async function generateCard() {
+            const agentName = document.getElementById('agent-name-input').value.trim() || 'UNKNOWN AGENT';
+            const theme = document.getElementById('card-theme-select').value;
+
+            // Populate template
+            const template = document.getElementById('card-template');
+            template.className = theme;
+            document.getElementById('ct-agent').textContent = agentName;
+
+            const total = userData.globalTotal || 0;
+            document.getElementById('ct-score').textContent = total.toLocaleString();
+
+            let earnedTier = [...TIERS].reverse().find(t => total >= t.value);
+            const badgeImg = document.getElementById('ct-badge');
+            const congratsMsg = document.getElementById('ct-congrats');
+            
+            let imgLoadPromise = Promise.resolve();
+
+            if (earnedTier) {
+                badgeImg.src = `static/orion/${earnedTier.name.toLowerCase()}.png`;
+                badgeImg.style.display = 'block';
+                congratsMsg.textContent = t('congratsCardMsg')(earnedTier.name);
+                congratsMsg.style.display = 'block';
+                
+                imgLoadPromise = new Promise((resolve) => {
+                    badgeImg.onload = resolve;
+                    badgeImg.onerror = resolve; // Continue even if image fails
+                });
+            } else {
+                badgeImg.style.display = 'none';
+                congratsMsg.style.display = 'none';
+            }
+
+            // Calculate specific stats with planned data
+            let stats = {
+                ifs: { a: 0, p: 0 },
+                bounties: { a: 0, p: 0 },
+                events: { a: 0, p: 0 },
+                anomaly: { a: userData.activities['anomaly']?.actual || 0, p: userData.activities['anomaly']?.planned || 0 }
+            };
+
+            ACTIVITIES.forEach(act => {
+                const actual = userData.activities[act.id]?.actual || 0;
+                const planned = userData.activities[act.id]?.planned || 0;
+
+                if (act.id.startsWith('ifs')) {
+                    stats.ifs.a += actual;
+                    stats.ifs.p += planned;
+                } else if (act.isBounty) {
+                    stats.bounties.p = act.max; // Use maximum possible tokens for percentage
+                } else if (act.id !== 'anomaly') {
+                    stats.events.a += actual;
+                    stats.events.p += planned;
+                }
+            });
+
+            let otherActualSum = stats.ifs.a + stats.events.a + stats.anomaly.a;
+            stats.bounties.a = Math.max(0, total - otherActualSum);
+
+            function formatStatHTML(a, p, isBounty=false) {
+                if (p > 0) {
+                    const pct = Math.round((a / p) * 100);
+                    const pctText = isBounty ? t('bountyComplete')(pct) : t('pctComplete')(pct);
+                    return `${a.toLocaleString()}<div class="stat-pct">${pctText}</div>`;
+                }
+                return a.toLocaleString();
+            }
+
+            document.getElementById('ct-bounties').innerHTML = formatStatHTML(stats.bounties.a, stats.bounties.p, true);
+            document.getElementById('ct-ifs').innerHTML = formatStatHTML(stats.ifs.a, stats.ifs.p);
+            document.getElementById('ct-events').innerHTML = formatStatHTML(stats.events.a, stats.events.p);
+            document.getElementById('ct-anomaly').innerHTML = formatStatHTML(stats.anomaly.a, stats.anomaly.p);
+
+            // Render
+            const btn = document.getElementById('btn-generate-card');
+            const originalText = btn.querySelector('span').textContent;
+            btn.querySelector('span').textContent = '...';
+            btn.disabled = true;
+
+            try {
+                // Wait for badge image to fully load
+                await imgLoadPromise;
+                // Small delay to ensure DOM updates are flushed before canvas reads it
+                await new Promise(r => setTimeout(r, 50));
+                const canvas = await html2canvas(template, {
+                    scale: 2, // High resolution
+                    backgroundColor: null,
+                    logging: false,
+                    useCORS: true // Ensure images (badges) load
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const container = document.getElementById('card-preview-container');
+                container.innerHTML = `<img src="${imgData}" alt="Orion Card">`;
+
+                document.getElementById('cardModal').style.display = 'block';
+            } catch (err) {
+                console.error("Card generation failed", err);
+                alert("Generation failed. Please try again.");
+            } finally {
+                btn.querySelector('span').textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
         function processImport(data) {
             if (data && (data.allSeasons || data.planner)) {
                 // Handle multi-season format (v4+)
                 if (data.allSeasons) {
                     allSeasonsData = data.allSeasons;
-                } 
+                }
                 // Handle legacy single-season format
                 else if (data.planner) {
                     const sid = data.seasonId || CURRENT_SEASON_ID;
@@ -1090,7 +1513,7 @@
                     currentLang = data.lang;
                     localStorage.setItem('ingress_orion_lang', currentLang);
                 }
-                
+
                 localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
                 userData = allSeasonsData[CURRENT_SEASON_ID] || { globalTotal: 0, activities: {} };
 
