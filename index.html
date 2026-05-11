@@ -181,7 +181,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(4px);
         }
 
@@ -353,30 +353,39 @@
         <!-- Data Migration -->
         <div class="ingress-card p-6 rounded-xl mb-8">
             <h2 id="label-migration" class="text-lg font-bold accent-blue mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
                 <span id="text-migration"></span>
             </h2>
             <div class="flex flex-wrap gap-3">
                 <button onclick="showShareModal()" class="btn-primary flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                     </svg>
                     <span id="btn-share-url"></span>
                 </button>
                 <button onclick="exportDataToFile()" class="btn-outline flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                     <span id="btn-export-json"></span>
                 </button>
                 <label class="btn-outline flex items-center cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                     <span id="btn-import-json"></span>
-                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="importDataFromFile(event)">
+                    <input type="file" id="import-file" class="hidden" accept=".json"
+                        onchange="importDataFromFile(event)">
                 </label>
             </div>
         </div>
@@ -446,6 +455,13 @@
                 syncConfirm: '检测到同步数据，是否覆盖本地记录？',
                 importSuccess: '导入成功！',
                 invalidData: '无效的数据格式！',
+                // Countdown
+                startsIn: (t) => `${t} 后开始`,
+                endsIn: (t) => `${t} 后结束`,
+                ended: '已结束',
+                unitDay: '天',
+                unitHour: '小时',
+                unitMinute: '分',
                 // Activity names
                 act_bounties: '每日任务 (Daily Bounties)',
                 act_ifs_apr: 'IFS - 四月',
@@ -504,6 +520,13 @@
                 syncConfirm: 'Sync data detected. Overwrite local records?',
                 importSuccess: 'Import successful!',
                 invalidData: 'Invalid data format!',
+                // Countdown
+                startsIn: (t) => `Starts in ${t}`,
+                endsIn: (t) => `Ends in ${t}`,
+                ended: 'Ended',
+                unitDay: 'd',
+                unitHour: 'h',
+                unitMinute: 'm',
                 // Activity names
                 act_bounties: 'Daily Bounties',
                 act_ifs_apr: 'IFS - April',
@@ -562,6 +585,13 @@
                 syncConfirm: '同期データを検出しました。ローカル記録を上書きしますか？',
                 importSuccess: 'インポート成功！',
                 invalidData: '無効なデータ形式です！',
+                // Countdown
+                startsIn: (t) => `あと ${t} で開始`,
+                endsIn: (t) => `あと ${t} で終了`,
+                ended: '終了',
+                unitDay: '日',
+                unitHour: '時間',
+                unitMinute: '分',
                 // Activity names
                 act_bounties: 'デイリーバウンティ',
                 act_ifs_apr: 'IFS - 4月',
@@ -599,6 +629,22 @@
 
         function t(key) {
             return I18N[currentLang]?.[key] ?? I18N['en']?.[key] ?? key;
+        }
+
+        function formatTimeRemaining(ms) {
+            const totalMinutes = Math.floor(ms / (1000 * 60));
+            const totalHours = Math.floor(totalMinutes / 60);
+            const days = Math.floor(totalHours / 24);
+            const hours = totalHours % 24;
+            const mins = totalMinutes % 60;
+
+            if (days > 0) {
+                return `${days}${t('unitDay')} ${hours}${t('unitHour')} ${mins}${t('unitMinute')}`;
+            } else if (hours > 0) {
+                return `${hours}${t('unitHour')} ${mins}${t('unitMinute')}`;
+            } else {
+                return `${mins}${t('unitMinute')}`;
+            }
         }
 
         // ==================== DATA ====================
@@ -745,8 +791,21 @@
                 if (act.utcStart && act.utcEnd) {
                     const start = new Date(act.utcStart);
                     const end = new Date(act.utcEnd);
+                    const now = new Date();
                     const fmt = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
                     displayDesc = `${start.toLocaleString([], fmt)} - ${end.toLocaleString([], fmt)} (${t('localTime')})`;
+
+                    let statusBadge = '';
+                    if (now < start) {
+                        const diff = start - now;
+                        statusBadge = `<div class="mt-1 text-[10px] text-cyan-400 font-semibold uppercase tracking-wider">${t('startsIn')(formatTimeRemaining(diff))}</div>`;
+                    } else if (now < end) {
+                        const diff = end - now;
+                        statusBadge = `<div class="mt-1 text-[10px] text-amber-400 font-semibold uppercase tracking-wider animate-pulse">${t('endsIn')(formatTimeRemaining(diff))}</div>`;
+                    } else {
+                        statusBadge = `<div class="mt-1 text-[10px] text-rose-500 font-semibold uppercase tracking-wider opacity-70">${t('ended')}</div>`;
+                    }
+                    displayDesc += statusBadge;
                 }
 
                 if (act.isBounty) {
@@ -818,7 +877,19 @@
 
             ACTIVITIES.forEach(act => {
                 if (!act.isBounty) {
-                    otherPlannedSum += (userData.activities[act.id]?.planned || 0);
+                    const stored = userData.activities[act.id] || { planned: 0, actual: 0 };
+                    let valToUse = stored.planned;
+
+                    const now = new Date();
+                    const hasEnded = act.utcEnd && now > new Date(act.utcEnd);
+
+                    // If actual > planned, use actual.
+                    // If activity ended, use actual regardless of planned.
+                    if (stored.actual > stored.planned || hasEnded) {
+                        valToUse = stored.actual;
+                    }
+
+                    otherPlannedSum += valToUse;
                 }
             });
 
@@ -864,7 +935,7 @@
             };
             const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
             const url = window.location.origin + window.location.pathname + '#data=' + base64Data;
-            
+
             document.getElementById('share-url').textContent = url;
             document.getElementById('shareModal').style.display = 'block';
 
@@ -904,7 +975,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ingress_orion_data_${new Date().toISOString().slice(0,10)}.json`;
+            a.download = `ingress_orion_data_${new Date().toISOString().slice(0, 10)}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -916,7 +987,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 try {
                     const data = JSON.parse(e.target.result);
                     processImport(data);
@@ -935,10 +1006,10 @@
                 try {
                     const jsonStr = decodeURIComponent(escape(atob(base64Data)));
                     const data = JSON.parse(jsonStr);
-                    
+
                     // Clear hash to avoid repeated prompts on refresh
                     window.history.replaceState(null, null, window.location.pathname);
-                    
+
                     if (confirm(t('syncConfirm'))) {
                         processImport(data);
                     }
@@ -956,7 +1027,7 @@
                     localStorage.setItem('ingress_orion_lang', currentLang);
                 }
                 localStorage.setItem('ingress_orion_planner_v3', JSON.stringify(userData));
-                
+
                 // Update UI
                 document.getElementById('global-total-actual').value = userData.globalTotal || 0;
                 applyLanguage();
