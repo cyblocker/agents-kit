@@ -676,7 +676,7 @@
             { id: 'ifs_may', nameKey: 'act_ifs_may', descKey: 'desc_ifs_may', max: 2500, unit: 'tokens' },
             { id: 'ifs_jun', nameKey: 'act_ifs_jun', descKey: 'desc_ifs_jun', max: 2500, unit: 'tokens' },
             { id: 'op_sakura', nameKey: 'act_op_sakura', utcStart: '2026-04-07T18:00:00Z', utcEnd: '2026-04-30T18:00:00Z', max: 3000, unit: 'tokens' },
-            { id: 'op_global', nameKey: 'act_op_global', utcStart: '2026-04-24T18:00:00Z', utcEnd: '2026-05-11T18:00:00Z', max: 7500, unit: 'tokens' },
+            { id: 'op_global', nameKey: 'act_op_global', utcStart: '2026-04-24T18:00:00Z', utcEnd: '2026-05-12T18:00:00Z', max: 7500, unit: 'tokens' },
             { id: 'op_may_early', nameKey: 'act_op_may_early', utcStart: '2026-05-01T18:00:00Z', utcEnd: '2026-06-01T18:00:00Z', max: 3000, unit: 'tokens' },
             { id: 'op_may_late', nameKey: 'act_op_may_late', max: 3000, unit: 'tokens' },
             { id: 'op_solstice', nameKey: 'act_op_solstice', max: 3000, unit: 'tokens' },
@@ -694,7 +694,7 @@
                 // Migration logic chain
                 const seasonKey = 'ingress_planner_data_' + CURRENT_SEASON_ID;
                 const legacyKey = 'ingress_orion_planner_v3';
-                
+
                 const migratedData = localStorage.getItem(seasonKey) || localStorage.getItem(legacyKey);
                 if (migratedData) {
                     allSeasonsData[CURRENT_SEASON_ID] = JSON.parse(migratedData);
@@ -1045,12 +1045,12 @@
                 const dataStr = hash.substring(6);
                 try {
                     let jsonStr = LZString.decompressFromEncodedURIComponent(dataStr);
-                    
+
                     // Fallback for legacy Base64 data
                     if (!jsonStr) {
                         try {
                             jsonStr = decodeURIComponent(escape(atob(dataStr)));
-                        } catch(e) {
+                        } catch (e) {
                             jsonStr = null;
                         }
                     }
@@ -1076,7 +1076,7 @@
                 // Handle multi-season format (v4+)
                 if (data.allSeasons) {
                     allSeasonsData = data.allSeasons;
-                } 
+                }
                 // Handle legacy single-season format
                 else if (data.planner) {
                     const sid = data.seasonId || CURRENT_SEASON_ID;
@@ -1090,7 +1090,7 @@
                     currentLang = data.lang;
                     localStorage.setItem('ingress_orion_lang', currentLang);
                 }
-                
+
                 localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
                 userData = allSeasonsData[CURRENT_SEASON_ID] || { globalTotal: 0, activities: {} };
 
