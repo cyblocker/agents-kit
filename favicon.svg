@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a0a4a" />
+      <stop offset="100%" stop-color="#0a0515" />
+    </linearGradient>
+  </defs>
+
+  <!-- Thick Purple Hexagon Border -->
+  <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="url(#bg)" stroke="#d946ef" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Minimalist Ingress Field Pattern (Y-shape) -->
+  <path d="M 50 50 L 50 18 M 50 50 L 78 66 M 50 50 L 22 66" stroke="#f8fafc" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Portal Nodes -->
+  <circle cx="50" cy="50" r="7" fill="#f8fafc" />
+  <circle cx="50" cy="18" r="4" fill="#38bdf8" />
+  <circle cx="78" cy="66" r="4" fill="#38bdf8" />
+  <circle cx="22" cy="66" r="4" fill="#38bdf8" />
+</svg>
