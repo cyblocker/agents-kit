@@ -1,4 +1,4 @@
-const CURRENT_SEASON_ID = '';
+const CURRENT_SEASON_ID = '2026_q2_orion';
 
 const SEASON_DB = {
     "2026_q2_orion": {
