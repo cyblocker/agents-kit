@@ -1,0 +1,23 @@
+{
+  "name": "Ingress Season Planner",
+  "short_name": "Ingress Planner",
+  "description": "Plan and track your Ingress season progress and badges.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#060a0f",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "app-icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "app-icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}
