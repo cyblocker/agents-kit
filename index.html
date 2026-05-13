@@ -457,6 +457,29 @@
             </div>
         </nav>
 
+        <!-- Sync Banner (Only shown if no data) -->
+        <div id="sync-banner" style="display:none;"
+            class="bg-blue-900/40 border border-blue-500 rounded-xl p-6 mb-8 text-center shadow-[0_0_20px_rgba(59,130,246,0.2)] relative z-20">
+            <button onclick="dismissBanner()"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 id="mig-banner-title" class="text-2xl font-bold text-white mb-2"></h2>
+            <p id="mig-banner-desc" class="text-slate-300 mb-6"></p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <button onclick="window.location.href='https://cyblocker.com/ingress/?request_export=true'"
+                    class="btn-primary px-8 py-3 text-lg font-bold bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
+                    <span id="btn-sync-legacy-banner"></span>
+                </button>
+                <button onclick="manualImportData()" class="btn-outline px-8 py-3 text-lg">
+                    <span id="btn-manual-import-banner"></span>
+                </button>
+            </div>
+        </div>
+
         <!-- Header -->
         <header class="mb-8 text-center relative z-20">
             <h1 id="page-title" class="text-4xl font-bold accent-blue mb-2 tracking-wider"></h1>
@@ -581,8 +604,8 @@
                     </svg>
                     <span>Sync from Legacy Site</span>
                 </button>
-                <button onclick="manualImportData()" class="btn-outline flex items-center">
-                    <span>Manual Import String</span>
+                <button id="btn-manual-import-card" onclick="manualImportData()" class="btn-outline flex items-center">
+                    <span id="btn-manual-import-card-text"></span>
                 </button>
             </div>
             <div class="flex flex-wrap gap-3">
@@ -757,7 +780,9 @@
                 migOverwriteConfirm: '发现现有 2026 Q2 Orion 记录。是否覆盖为来自 cyblocker.com/ingress 的旧数据？警告：此操作无法撤销。',
                 migSuccess: '迁移成功！您的旧数据已导入。',
                 promptManualImport: '粘贴手动导出文本（以 AGENTSKIT_ 开头）：',
-                migInvalidFormatStr: '格式无效。文本必须以 AGENTSKIT_ 开头'
+                migInvalidFormatStr: '格式无效。文本必须以 AGENTSKIT_ 开头',
+                migBannerTitle: '新赛季数据迁移',
+                migBannerDesc: '检测到您尚未在 Agents Kit 记录数据。如果您有旧站点的记录，可以通过以下方式快速同步。',
             },
             en: {
                 phTitle: 'Ingress Season Planner',
@@ -828,7 +853,9 @@
                 migOverwriteConfirm: 'Found existing record. Overwrite with legacy data from cyblocker.com/ingress? WARNING: This cannot be undone.',
                 migSuccess: 'Migration successful! Your legacy data has been imported.',
                 promptManualImport: 'Paste the manual export string (starting with AGENTSKIT_):',
-                migInvalidFormatStr: 'Invalid format. The string must start with AGENTSKIT_'
+                migInvalidFormatStr: 'Invalid format. The string must start with AGENTSKIT_',
+                migBannerTitle: 'Data Migration',
+                migBannerDesc: 'It seems you haven\'t recorded any data on Agents Kit yet. If you have records on the legacy site, you can sync them now.',
             },
             ja: {
                 phTitle: 'Ingress シーズンプランナー',
@@ -899,7 +926,9 @@
                 migOverwriteConfirm: '既存の記録が見つかりました。cyblocker.com/ingress の旧データで上書きしますか？ 警告: この操作は元に戻せません。',
                 migSuccess: '移行に成功しました！旧データがインポートされました。',
                 promptManualImport: '手動エクスポート用の文字列（AGENTSKIT_ で始まる）を貼り付けてください：',
-                migInvalidFormatStr: '無効な形式です。文字列は AGENTSKIT_ で始まる必要があります'
+                migInvalidFormatStr: '無効な形式です。文字列は AGENTSKIT_ で始まる必要があります',
+                migBannerTitle: 'データ移行',
+                migBannerDesc: 'Agents Kit にまだデータが記録されていないようです。旧サイトに記録がある場合は、今すぐ同期できます。',
             }
         };
 
@@ -975,14 +1004,46 @@
         loadAllSeasonsData();
 
         function updateSyncButtonVisibility() {
-            const btn = document.getElementById('btn-sync-legacy');
-            if (!btn) return;
+            const btnSync = document.getElementById('btn-sync-legacy');
+            const btnManual = document.getElementById('btn-manual-import-card');
+            if (!btnSync) return;
+            
             const existingLocalData = allSeasonsData['2026_q2_orion'];
-            if (existingLocalData && (existingLocalData.globalTotal > 0 || Object.keys(existingLocalData.activities).length > 0)) {
-                btn.className = 'btn-outline flex items-center text-xs opacity-70';
+            const hasData = existingLocalData && (existingLocalData.globalTotal > 0 || Object.keys(existingLocalData.activities).length > 0);
+            
+            if (hasData) {
+                btnSync.className = 'btn-outline flex items-center text-xs opacity-70';
+                if (btnManual) btnManual.className = 'btn-outline flex items-center text-xs opacity-70';
             } else {
-                btn.className = 'btn-primary flex items-center bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(34,197,94,0.4)]';
+                btnSync.className = 'btn-primary flex items-center bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(34,197,94,0.4)]';
+                if (btnManual) btnManual.className = 'btn-outline flex items-center';
             }
+        }
+
+        function updateBannerVisibility() {
+            const banner = document.getElementById('sync-banner');
+            if (!banner) return;
+            
+            const existingLocalData = allSeasonsData['2026_q2_orion'];
+            const hasData = existingLocalData && (existingLocalData.globalTotal > 0 || Object.keys(existingLocalData.activities).length > 0);
+            
+            // If data exists, permanently dismiss the banner
+            if (hasData) {
+                localStorage.setItem('agentskit_banner_dismissed', 'true');
+            }
+
+            const isDismissed = localStorage.getItem('agentskit_banner_dismissed') === 'true';
+            
+            if (!hasData && !isDismissed) {
+                banner.style.display = 'block';
+            } else {
+                banner.style.display = 'none';
+            }
+        }
+
+        window.dismissBanner = function() {
+            localStorage.setItem('agentskit_banner_dismissed', 'true');
+            updateBannerVisibility();
         }
 
         function init() {
@@ -991,6 +1052,7 @@
             initContact();
             checkHashData();
             updateSyncButtonVisibility();
+            updateBannerVisibility();
 
             if (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID]) {
                 document.getElementById('tracker-view').style.display = 'none';
@@ -1199,12 +1261,16 @@
             document.getElementById('ctl-ifs').textContent = t('statIFS');
             document.getElementById('ctl-events').textContent = t('statEvents');
             document.getElementById('ctl-anomaly').textContent = t('statAnomaly');
+            
+            const elBannerTitle = document.getElementById('mig-banner-title'); if (elBannerTitle) elBannerTitle.textContent = t('migBannerTitle');
+            const elBannerDesc = document.getElementById('mig-banner-desc'); if (elBannerDesc) elBannerDesc.textContent = t('migBannerDesc');
+            const elBtnSyncBanner = document.getElementById('btn-sync-legacy-banner'); if (elBtnSyncBanner) elBtnSyncBanner.textContent = t('btnSyncLegacy');
+            const elBtnManualBanner = document.getElementById('btn-manual-import-banner'); if (elBtnManualBanner) elBtnManualBanner.textContent = t('btnManualImportStr');
 
             const elBtnSyncLegacy = document.getElementById('btn-sync-legacy'); if (elBtnSyncLegacy) elBtnSyncLegacy.querySelector('span').textContent = t('btnSyncLegacy');
 
             // Manual import btn doesn't have an ID but it is the next sibling of sync btn or can just be selected
-            const elBtnManualImport = document.querySelector('button[onclick="manualImportData()"] span');
-            if (elBtnManualImport) elBtnManualImport.textContent = t('btnManualImportStr');
+            const elBtnManualCard = document.getElementById('btn-manual-import-card-text'); if (elBtnManualCard) elBtnManualCard.textContent = t('btnManualImportStr');
 
             // Title tag
             const isPlaceholder = document.getElementById('placeholder-view').style.display === 'block';
