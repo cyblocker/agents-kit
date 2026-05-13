@@ -593,7 +593,7 @@
                 </svg>
                 <span id="text-migration"></span>
             </h2>
-            <div class="flex flex-wrap gap-3 mb-4 border-b border-slate-700 pb-4">
+            <div id="migration-sync-options" class="flex flex-wrap gap-3 mb-4 border-b border-slate-700 pb-4">
                 <button onclick="window.location.href='https://cyblocker.com/ingress/?request_export=true'"
                     id="btn-sync-legacy"
                     class="btn-primary flex items-center bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
@@ -1057,6 +1057,11 @@
             if (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID]) {
                 document.getElementById('tracker-view').style.display = 'none';
                 document.getElementById('placeholder-view').style.display = 'block';
+                
+                // Hide Migration Options in placeholder view
+                const migrationOptions = document.getElementById('migration-sync-options');
+                if (migrationOptions) migrationOptions.style.display = 'none';
+
                 document.getElementById('page-title').style.display = 'none';
                 document.getElementById('page-subtitle').style.display = 'none';
                 document.getElementById('footer-source').style.display = 'none';
@@ -1105,6 +1110,13 @@
         function initSeason(id) {
             document.getElementById('placeholder-view').style.display = 'none';
             document.getElementById('tracker-view').style.display = 'block';
+
+            // Show/Hide Migration Options (Only for Orion season migration)
+            const migrationOptions = document.getElementById('migration-sync-options');
+            if (migrationOptions) {
+                migrationOptions.style.display = (id === '2026_q2_orion') ? 'flex' : 'none';
+            }
+
             document.getElementById('page-title').style.display = 'block';
             document.getElementById('page-subtitle').style.display = 'block';
             document.getElementById('footer-source').style.display = 'block';
