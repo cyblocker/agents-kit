@@ -1,0 +1,47 @@
+name: Cross-Site Migration Test
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Agents Kit (New Site)
+        uses: actions/checkout@v4
+
+      - name: Checkout Legacy Site
+        uses: actions/checkout@v4
+        with:
+          repository: cyblocker/cyblocker.github.io
+          path: legacy-site
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          npm init -y
+          npm install -D @playwright/test wait-on serve
+          npx playwright install --with-deps chromium
+
+      - name: Start Servers and Run Tests
+        run: |
+          # Start Legacy Site (Port 8000)
+          # We point to legacy-site/ingress which contains the old index.html
+          npx serve legacy-site/ingress -p 8000 &
+          
+          # Start Agents Kit (Port 8001)
+          npx serve . -p 8001 &
+          
+          # Wait for servers to be ready
+          npx wait-on http://localhost:8000 http://localhost:8001
+          
+          # Run the test
+          npx playwright test migration_test.spec.js
