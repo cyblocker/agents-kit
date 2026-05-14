@@ -4,7 +4,7 @@
 
 🔗 **Live Site:** [AgentsKit.org](https://agentskit.org)
 
-![Agents Kit Header](app-icon.png)
+[![Cross-Site Migration Test](https://github.com/cyblocker/agents-kit/actions/workflows/migration-test.yml/badge.svg)](https://github.com/cyblocker/agents-kit/actions/workflows/migration-test.yml)
 
 ## Key Features
 
