@@ -167,7 +167,7 @@
         }
 
         /* Responsive Fixes */
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .badge-label-container {
                 height: 120px !important;
             }
@@ -177,12 +177,12 @@
             }
 
             .hide-on-mobile {
-                display: none;
+                display: none !important;
             }
 
             input[type="number"] {
-                min-width: 70px;
-                padding: 4px 8px;
+                min-width: 80px;
+                padding: 4px 6px;
                 font-size: 0.875rem;
             }
 
@@ -194,6 +194,22 @@
             .progress-bar-container {
                 margin-top: 10px;
             }
+
+            /* Table optimizations for narrow screens */
+            .hide-on-narrow {
+                display: none !important;
+            }
+            .show-on-narrow {
+                display: block !important;
+            }
+            
+            th, td {
+                padding: 0.75rem 0.5rem !important;
+            }
+        }
+
+        .show-on-narrow {
+            display: none;
         }
 
         /* QR Code Modal Styles */
@@ -567,9 +583,9 @@
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-slate-800/50">
                             <tr>
-                                <th id="th-activity" class="p-4 text-sm font-semibold text-slate-300 min-w-[140px]">
+                                <th id="th-activity" class="p-4 text-sm font-semibold text-slate-300 min-w-[120px] sm:min-w-[140px]">
                                 </th>
-                                <th id="th-max" class="p-4 text-sm font-semibold text-slate-300"></th>
+                                <th id="th-max" class="p-4 text-sm font-semibold text-slate-300 hide-on-narrow"></th>
                                 <th id="th-planned" class="p-4 text-sm font-semibold text-slate-300"></th>
                                 <th id="th-actual" class="p-4 text-sm font-semibold text-slate-300"></th>
                                 <th id="th-updated" class="p-4 text-sm font-semibold text-slate-300 hide-on-mobile">
@@ -784,6 +800,7 @@
                 migInvalidFormatStr: '格式无效。文本必须以 AGENTSKIT_ 开头',
                 migBannerTitle: '新赛季数据迁移',
                 migBannerDesc: '检测到您尚未在 Agents Kit 记录数据。如果您有旧站点的记录，可以通过以下方式快速同步。',
+                limitLabel: '上限',
             },
             en: {
                 phTitle: 'Ingress Season Planner',
@@ -857,6 +874,7 @@
                 migInvalidFormatStr: 'Invalid format. The string must start with AGENTSKIT_',
                 migBannerTitle: 'Data Migration',
                 migBannerDesc: 'It seems you haven\'t recorded any data on Agents Kit yet. If you have records on the legacy site, you can sync them now.',
+                limitLabel: 'Limit',
             },
             ja: {
                 phTitle: 'Ingress シーズンプランナー',
@@ -930,6 +948,7 @@
                 migInvalidFormatStr: '無効な形式です。文字列は AGENTSKIT_ で始まる必要があります',
                 migBannerTitle: 'データ移行',
                 migBannerDesc: 'Agents Kit にまだデータが記録されていないようです。旧サイトに記録がある場合は、今すぐ同期できます。',
+                limitLabel: '上限',
             }
         };
 
@@ -1058,7 +1077,7 @@
             if (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID]) {
                 document.getElementById('tracker-view').style.display = 'none';
                 document.getElementById('placeholder-view').style.display = 'block';
-                
+
                 // Hide Migration Options in placeholder view
                 const migrationOptions = document.getElementById('migration-sync-options');
                 if (migrationOptions) migrationOptions.style.display = 'none';
@@ -1395,10 +1414,11 @@
                 row.innerHTML = `
                     <td class="p-4">
                         <div class="font-semibold text-slate-200 text-sm sm:text-base">${t(act.nameKey)}</div>
+                        <div class="show-on-narrow text-[10px] sm:text-xs text-slate-400 font-mono mt-0.5">${t('limitLabel')}: ${displayMax}</div>
                         <div class="text-[10px] sm:text-xs text-slate-500">${displayDesc}</div>
                         ${hint}
                     </td>
-                    <td class="p-4 text-slate-400 font-mono text-xs sm:text-sm">${displayMax}</td>
+                    <td class="p-4 text-slate-400 font-mono text-xs sm:text-sm hide-on-narrow">${displayMax}</td>
                     <td class="p-4">${plannedInput}</td>
                     <td class="p-4">${actualInput}</td>
                     <td class="p-4 hide-on-mobile">
