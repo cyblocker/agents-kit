@@ -1,0 +1,12 @@
+{
+  "name": "agents-kit",
+  "version": "1.0.0",
+  "description": "Ingress Season Planner",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "npm run build && npx http-server"
+  },
+  "devDependencies": {
+    "terser": "^5.29.0"
+  }
+}
