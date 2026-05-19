@@ -1,0 +1,12 @@
+name = "agents-kit"
+type = "javascript"
+
+[build]
+command = "npm run build"
+cwd = "./"
+watch_paths = ["src/**/*.js", "src/**/*.css", "data.js", "index.html"]
+
+[build.upload]
+format = "service-worker"
+
+[env.production]
