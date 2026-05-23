@@ -29,6 +29,7 @@ jobs:
         run: |
           rm -f package-lock.json
           npm install
+          npm install -D @tailwindcss/oxide-linux-x64-gnu
           npm install -D @playwright/test serve
           npx playwright install --with-deps chromium
 
