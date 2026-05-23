@@ -1,5 +1,4 @@
 /* Minimal CSS - Replace Tailwind */
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
 @source "./index.html";
 @source "./app.js";
@@ -25,7 +24,7 @@
 }
 
 body {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Exo 2', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-dark);
   color: var(--text-primary);
   background-image: radial-gradient(circle at 50% 50%, #101827 0%, var(--bg-dark) 100%);
@@ -74,29 +73,77 @@ body {
   align-items: center;
 }
 
-.gap-2 { gap: 0.5rem; }
-.gap-3 { gap: 0.75rem; }
-.gap-4 { gap: 1rem; }
+.gap-2 {
+  gap: 0.5rem;
+}
 
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-8 { margin-bottom: 2rem; }
+.gap-3 {
+  gap: 0.75rem;
+}
 
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
+.gap-4 {
+  gap: 1rem;
+}
 
-.text-sm { font-size: 0.875rem; }
-.text-lg { font-size: 1.125rem; }
-.text-xl { font-size: 1.25rem; }
-.text-2xl { font-size: 1.5rem; }
-.text-3xl { font-size: 1.875rem; }
-.text-4xl { font-size: 2.25rem; }
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
 
-.font-bold { font-weight: 700; }
-.font-semibold { font-weight: 600; }
+.mb-4 {
+  margin-bottom: 1rem;
+}
 
-.text-center { text-align: center; }
-.text-left { text-align: left; }
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
 
 /* Components */
 .ingress-card {
@@ -105,7 +152,7 @@ body {
   backdrop-filter: blur(6px);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   border-radius: 0.75rem;
-  
+
   /* Force GPU acceleration to eliminate scroll rendering lag and white paint flashes */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -270,7 +317,8 @@ thead {
   background: rgba(30, 41, 59, 0.5);
 }
 
-th, td {
+th,
+td {
   padding: 1rem;
   font-size: 0.875rem;
 }
@@ -299,7 +347,8 @@ th, td {
     font-size: 0.875rem;
   }
 
-  th, td {
+  th,
+  td {
     padding: 0.75rem 0.5rem !important;
   }
 }
@@ -392,19 +441,41 @@ footer {
 }
 
 /* Utilities */
-.w-full { width: 100%; }
-.w-auto { width: auto; }
-.min-w { min-width: 150px; }
+.w-full {
+  width: 100%;
+}
 
-.uppercase { text-transform: uppercase; }
-.lowercase { text-transform: lowercase; }
+.w-auto {
+  width: auto;
+}
 
-.opacity-50 { opacity: 0.5; }
+.min-w {
+  min-width: 150px;
+}
 
-.select-none { user-select: none; }
+.uppercase {
+  text-transform: uppercase;
+}
 
-.tracking-wider { letter-spacing: 0.125em; }
-.tracking-widest { letter-spacing: 0.3em; }
+.lowercase {
+  text-transform: lowercase;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.select-none {
+  user-select: none;
+}
+
+.tracking-wider {
+  letter-spacing: 0.125em;
+}
+
+.tracking-widest {
+  letter-spacing: 0.3em;
+}
 
 /* Missing badge marker and responsive fix styles */
 .badge-marker {
@@ -420,18 +491,22 @@ footer {
   .badge-label-container {
     height: 120px !important;
   }
+
   .badge-item:nth-child(even) {
     top: 60px !important;
   }
+
   input[type="number"] {
     min-width: 80px;
     padding: 4px 6px;
     font-size: 0.875rem;
   }
+
   .total-input-box input[type="number"] {
     min-width: 150px;
     font-size: 1.5rem;
   }
+
   .progress-bar-container {
     margin-top: 10px;
   }

@@ -122,13 +122,3 @@ function loadScript(src) {
         document.head.appendChild(script);
     });
 }
-
-// Lazy Load data.min.js followed by app.min.js
-(function startLoading() {
-    const version = '20260514_1';
-    loadScript(`data.min.js?v=${version}`)
-        .then(() => loadScript(`app.min.js?v=${version}`))
-        .catch(err => {
-            console.error('Failed to load application assets:', err);
-        });
-})();

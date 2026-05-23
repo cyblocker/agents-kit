@@ -18,16 +18,41 @@
     <meta name="apple-mobile-web-app-title" content="Ingress Planner">
     <link rel="apple-touch-icon" href="app-icon.png">
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CR66W0QW5R"></script>
+    <!-- Google tag (gtag.js) Stub & Deferred Loader -->
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-CR66W0QW5R');
+
+        // Defer loading of gtag.js until the page is fully loaded and idle
+        window.addEventListener('load', () => {
+            const delay = window.requestIdleCallback ? 1000 : 2000;
+            const loadAnalytics = () => {
+                const script = document.createElement('script');
+                script.src = 'https://www.googletagmanager.com/gtag/js?id=G-CR66W0QW5R';
+                script.async = true;
+                document.head.appendChild(script);
+            };
+            if (window.requestIdleCallback) {
+                requestIdleCallback(loadAnalytics);
+            } else {
+                setTimeout(loadAnalytics, delay);
+            }
+        });
     </script>
 
+    <!-- Preconnect & Preload Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Parallel Script Loading (Strict browser execution order guaranteed) -->
     <script src="core.min.js" defer></script>
+    <script src="data.min.js" defer></script>
+    <script src="app.min.js" defer></script>
+
     <link rel="stylesheet" href="utilities.css">
 </head>
 
