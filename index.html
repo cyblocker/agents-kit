@@ -54,7 +54,7 @@
         <!-- Sync Banner (Only shown if no data) -->
         <div id="sync-banner" style="display:none;"
             class="bg-blue-900/40 border border-blue-500 rounded-xl p-6 mb-8 text-center shadow-[0_0_20px_rgba(59,130,246,0.2)] relative z-20">
-            <button onclick="dismissBanner()"
+            <button onclick="dismissBanner()" aria-label="Dismiss sync banner"
                 class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -79,6 +79,8 @@
             <h1 id="page-title" class="text-4xl font-bold accent-blue mb-2 tracking-wider"></h1>
             <p id="page-subtitle" class="text-slate-400"></p>
         </header>
+
+        <main id="main-content">
 
         <!-- Placeholder View -->
         <div id="placeholder-view" style="display:none;" class="text-center py-20">
@@ -293,6 +295,7 @@
                 <div class="card-footer-url">AgentsKit.org</div>
             </div>
         </div>
+        </main>
 
         <footer class="text-center text-slate-500 text-sm mb-12">
             <p id="footer-source"></p>

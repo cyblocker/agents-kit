@@ -636,13 +636,14 @@ function renderTable() {
                 </div>
             `;
             hint = `<div class="bounty-hint">${t('bountyHint')(potential)}</div>`;
-        } else {
             plannedInput = `
                 <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
+                       aria-label="${t(act.nameKey)} (${t('thPlanned')})"
                        onchange="updateValue('${act.id}', 'planned', this.value)">
             `;
             actualInput = `
                 <input type="number" min="0" max="${act.max}" value="${stored.actual}" 
+                       aria-label="${t(act.nameKey)} (${t('thActual')})"
                        onchange="updateValue('${act.id}', 'actual', this.value)">
             `;
         }
