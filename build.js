@@ -58,7 +58,7 @@ async function build() {
   await minifyJS('app.js', `${OUTPUT_DIR}/app.min.js`);
 
   // 3. Copy static files
-  const filesToCopy = ['index.html', 'manifest.json', 'favicon.svg', 'sw.js', 'app-icon.png', 'style.css', 'utilities.css'];
+  const filesToCopy = ['index.html', 'manifest.json', 'favicon.svg', 'sw.js', 'app-icon.png', 'style.css', 'utilities.css', 'robots.txt'];
   
   for (const file of filesToCopy) {
     if (fs.existsSync(file)) {
