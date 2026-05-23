@@ -27,25 +27,15 @@ jobs:
 
       - name: Install dependencies
         run: |
+          rm -f package-lock.json
           npm install
-          npm install -D @playwright/test wait-on serve
+          npm install -D @playwright/test serve
           npx playwright install --with-deps chromium
 
       - name: Build project
         run: |
           npm run build
 
-      - name: Start Servers and Run Tests
+      - name: Run E2E Tests
         run: |
-          # Start Legacy Site (Port 8000)
-          # We point to legacy-site/ingress which contains the old index.html
-          npx serve legacy-site/ingress -p 8000 &
-          
-          # Start Agents Kit (Port 8001) served from compiled dist directory
-          npx serve dist -p 8001 &
-          
-          # Wait for servers to be ready
-          npx wait-on http://localhost:8000 http://localhost:8001
-          
-          # Run the test
-          npx playwright test migration_test.spec.js
+          npx playwright test
