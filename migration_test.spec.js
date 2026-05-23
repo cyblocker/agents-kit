@@ -5,6 +5,20 @@ test.describe('Ingress Data Migration Flow', () => {
   test('should successfully migrate 2026 Q2 Orion data from legacy to new site via manual export', async ({ page }) => {
     
     // Step 1: Navigate to the legacy site and seed mock data
+    // Force clipboard copy to fail, guaranteeing the legacy site falls back to the prompt dialog
+    await page.addInitScript(() => {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText = () => Promise.reject(new Error("Mock clipboard failure"));
+      } else {
+        Object.defineProperty(navigator, 'clipboard', {
+          value: {
+            writeText: () => Promise.reject(new Error("Mock clipboard failure"))
+          },
+          configurable: true
+        });
+      }
+    });
+
     await page.goto('http://localhost:8000/?migration_debug=true');
     
     const mockLegacyData = {
