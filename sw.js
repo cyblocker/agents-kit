@@ -1,11 +1,14 @@
-const CACHE_NAME = 'agents-kit-v20260514';
+const CACHE_NAME = 'agents-kit-v20260523';
 const ASSETS = [
   './',
   './index.html',
-  './data.js',
+  './core.min.js',
+  './data.min.js',
+  './app.min.js',
+  './utilities.css',
   './favicon.svg',
   './app-icon.png',
-  'https://cdn.tailwindcss.com',
+  './manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
