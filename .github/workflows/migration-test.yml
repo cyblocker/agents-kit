@@ -2,9 +2,9 @@ name: Cross-Site Migration Test
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, dev ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, dev ]
   workflow_dispatch:
 
 jobs:
@@ -27,9 +27,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm init -y
+          npm install
           npm install -D @playwright/test wait-on serve
           npx playwright install --with-deps chromium
+
+      - name: Build project
+        run: |
+          npm run build
 
       - name: Start Servers and Run Tests
         run: |
@@ -37,8 +41,8 @@ jobs:
           # We point to legacy-site/ingress which contains the old index.html
           npx serve legacy-site/ingress -p 8000 &
           
-          # Start Agents Kit (Port 8001)
-          npx serve . -p 8001 &
+          # Start Agents Kit (Port 8001) served from compiled dist directory
+          npx serve dist -p 8001 &
           
           # Wait for servers to be ready
           npx wait-on http://localhost:8000 http://localhost:8001
