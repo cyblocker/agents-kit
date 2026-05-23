@@ -1,5 +1,7 @@
 /* Minimal CSS - Replace Tailwind */
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap');
+@import "tailwindcss";
+@source "./index.html";
+@source "./app.js";
 
 /* CSS Variables for reusability */
 :root {
@@ -22,7 +24,7 @@
 }
 
 body {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Exo 2', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-dark);
   color: var(--text-primary);
   background-image: radial-gradient(circle at 50% 50%, #101827 0%, var(--bg-dark) 100%);
@@ -71,37 +73,90 @@ body {
   align-items: center;
 }
 
-.gap-2 { gap: 0.5rem; }
-.gap-3 { gap: 0.75rem; }
-.gap-4 { gap: 1rem; }
+.gap-2 {
+  gap: 0.5rem;
+}
 
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-8 { margin-bottom: 2rem; }
+.gap-3 {
+  gap: 0.75rem;
+}
 
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
+.gap-4 {
+  gap: 1rem;
+}
 
-.text-sm { font-size: 0.875rem; }
-.text-lg { font-size: 1.125rem; }
-.text-xl { font-size: 1.25rem; }
-.text-2xl { font-size: 1.5rem; }
-.text-3xl { font-size: 1.875rem; }
-.text-4xl { font-size: 2.25rem; }
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
 
-.font-bold { font-weight: 700; }
-.font-semibold { font-weight: 600; }
+.mb-4 {
+  margin-bottom: 1rem;
+}
 
-.text-center { text-align: center; }
-.text-left { text-align: left; }
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
 
 /* Components */
 .ingress-card {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.9);
   border: 1px solid var(--border-dark);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   border-radius: 0.75rem;
+
+  /* Force GPU acceleration to eliminate scroll rendering lag and white paint flashes */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .accent-blue {
@@ -262,7 +317,8 @@ thead {
   background: rgba(30, 41, 59, 0.5);
 }
 
-th, td {
+th,
+td {
   padding: 1rem;
   font-size: 0.875rem;
 }
@@ -291,7 +347,8 @@ th, td {
     font-size: 0.875rem;
   }
 
-  th, td {
+  th,
+  td {
     padding: 0.75rem 0.5rem !important;
   }
 }
@@ -384,16 +441,202 @@ footer {
 }
 
 /* Utilities */
-.w-full { width: 100%; }
-.w-auto { width: auto; }
-.min-w { min-width: 150px; }
+.w-full {
+  width: 100%;
+}
 
-.uppercase { text-transform: uppercase; }
-.lowercase { text-transform: lowercase; }
+.w-auto {
+  width: auto;
+}
 
-.opacity-50 { opacity: 0.5; }
+.min-w {
+  min-width: 150px;
+}
 
-.select-none { user-select: none; }
+.uppercase {
+  text-transform: uppercase;
+}
 
-.tracking-wider { letter-spacing: 0.125em; }
-.tracking-widest { letter-spacing: 0.3em; }
+.lowercase {
+  text-transform: lowercase;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.select-none {
+  user-select: none;
+}
+
+.tracking-wider {
+  letter-spacing: 0.125em;
+}
+
+.tracking-widest {
+  letter-spacing: 0.3em;
+}
+
+/* Missing badge marker and responsive fix styles */
+.badge-marker {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 20px;
+  background: #fff;
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .badge-label-container {
+    height: 120px !important;
+  }
+
+  .badge-item:nth-child(even) {
+    top: 60px !important;
+  }
+
+  input[type="number"] {
+    min-width: 80px;
+    padding: 4px 6px;
+    font-size: 0.875rem;
+  }
+
+  .total-input-box input[type="number"] {
+    min-width: 150px;
+    font-size: 1.5rem;
+  }
+
+  .progress-bar-container {
+    margin-top: 10px;
+  }
+}
+
+/* Explicit mx-auto override for high browser compatibility */
+.mx-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Card Template specific styles */
+.card-title {
+  text-align: center;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.card-title-l1 {
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.card-title-l2 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.card-agent {
+  font-size: 48px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.theme-res .card-agent {
+  color: #60a5fa;
+  text-shadow: 0 0 20px rgba(96, 165, 250, 0.8);
+}
+
+.theme-enl .card-agent {
+  color: #4ade80;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.8);
+}
+
+.card-score {
+  font-size: 72px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  font-family: 'Exo 2', sans-serif;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.card-congrats {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fbbf24;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.card-stats {
+  width: 100%;
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-content: start;
+}
+
+.stat-box {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-label {
+  font-size: 18px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.stat-pct {
+  display: block;
+  font-size: 16px;
+  color: #94a3b8;
+  margin-top: 4px;
+  font-weight: normal;
+}
+
+.card-footer {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: auto;
+  text-align: center;
+  letter-spacing: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-footer-url {
+  font-size: 16px;
+  opacity: 1;
+  margin-top: 8px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #cbd5e1;
+}
+
+#card-preview-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}

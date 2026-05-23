@@ -5,451 +5,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ingress Orion Season Planner</title>
+    <meta name="description"
+        content="Agents Kit (Ingress Season Planner) - The ultimate utility tool for Ingress agents to plan daily bounties, track season events, forecast medal tiers, and synchronize progress offline.">
     <link rel="icon" type="svg+xml" href="favicon.svg" />
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#060a0f">
 
     <!-- iOS PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Ingress Planner">
     <link rel="apple-touch-icon" href="app-icon.png">
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CR66W0QW5R"></script>
+    <!-- Google tag (gtag.js) Stub & Deferred Loader -->
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-CR66W0QW5R');
+
+        // Defer loading of gtag.js until the page is fully loaded and idle
+        window.addEventListener('load', () => {
+            const delay = window.requestIdleCallback ? 1000 : 2000;
+            const loadAnalytics = () => {
+                const script = document.createElement('script');
+                script.src = 'https://www.googletagmanager.com/gtag/js?id=G-CR66W0QW5R';
+                script.async = true;
+                document.head.appendChild(script);
+            };
+            if (window.requestIdleCallback) {
+                requestIdleCallback(loadAnalytics);
+            } else {
+                setTimeout(loadAnalytics, delay);
+            }
+        });
     </script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="data.js?v=20260514_1"></script>
+    <!-- Preconnect & Preload Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <script>
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
-                    console.log('SW registered:', reg);
-                }).catch(err => {
-                    console.log('SW registration failed:', err);
-                });
-            });
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap');
+    <!-- Parallel Script Loading (Strict browser execution order guaranteed) -->
+    <script src="core.min.js" defer></script>
+    <script src="data.min.js" defer></script>
+    <script src="app.min.js" defer></script>
 
-        body {
-            font-family: 'Exo 2', sans-serif;
-            background-color: #060a0f;
-            color: #e2e8f0;
-            background-image: radial-gradient(circle at 50% 50%, #101827 0%, #060a0f 100%);
-            min-height: 100vh;
-        }
-
-        .ingress-card {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid #1e293b;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .accent-blue {
-            color: #60a5fa;
-            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
-        }
-
-        .accent-green {
-            color: #4ade80;
-            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
-        }
-
-        .accent-purple {
-            color: #a78bfa;
-            text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
-        }
-
-        .accent-orange {
-            color: #fb923c;
-            text-shadow: 0 0 10px rgba(251, 146, 60, 0.5);
-        }
-
-        .progress-bar-container {
-            height: 12px;
-            background: #1e293b;
-            border-radius: 6px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            transition: width 0.5s ease-in-out;
-            background: linear-gradient(90deg, #3b82f6, #60a5fa);
-            box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
-        }
-
-        .badge-marker {
-            position: absolute;
-            top: -4px;
-            width: 2px;
-            height: 20px;
-            background: #fff;
-            z-index: 10;
-        }
-
-        input[type="number"] {
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #f8fafc;
-            padding: 6px 12px;
-            border-radius: 4px;
-            width: 100%;
-            max-width: 180px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #60a5fa;
-            box-shadow: 0 0 5px rgba(96, 165, 250, 0.5);
-        }
-
-        .timestamp {
-            font-size: 0.7rem;
-            color: #64748b;
-        }
-
-        .bounty-hint {
-            font-size: 0.75rem;
-            color: #fb923c;
-            margin-top: 4px;
-        }
-
-        .total-input-box {
-            border: 2px solid #3b82f6;
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .lang-toggle {
-            display: inline-flex;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #334155;
-        }
-
-        .lang-btn {
-            padding: 4px 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            background: transparent;
-            color: #94a3b8;
-            border: none;
-            transition: all 0.2s ease;
-            letter-spacing: 0.05em;
-        }
-
-        .lang-btn:hover {
-            color: #e2e8f0;
-            background: rgba(96, 165, 250, 0.15);
-        }
-
-        .lang-btn.active {
-            background: rgba(96, 165, 250, 0.25);
-            color: #60a5fa;
-            text-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
-        }
-
-        /* Responsive Fixes */
-        @media (max-width: 768px) {
-            .badge-label-container {
-                height: 120px !important;
-            }
-
-            .badge-item:nth-child(even) {
-                top: 60px !important;
-            }
-
-            .hide-on-mobile {
-                display: none !important;
-            }
-
-            input[type="number"] {
-                min-width: 80px;
-                padding: 4px 6px;
-                font-size: 0.875rem;
-            }
-
-            .total-input-box input[type="number"] {
-                min-width: 150px;
-                font-size: 1.5rem;
-            }
-
-            .progress-bar-container {
-                margin-top: 10px;
-            }
-
-            /* Table optimizations for narrow screens */
-            .hide-on-narrow {
-                display: none !important;
-            }
-            .show-on-narrow {
-                display: block !important;
-            }
-            
-            th, td {
-                padding: 0.75rem 0.5rem !important;
-            }
-        }
-
-        .show-on-narrow {
-            display: none;
-        }
-
-        /* QR Code Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
-            overflow-y: auto;
-            padding: 20px 0;
-        }
-
-        .modal-content {
-            background: #0f172a;
-            margin: 40px auto;
-            padding: 20px;
-            border: 1px solid #1e293b;
-            width: 95%;
-            max-width: 400px;
-            border-radius: 12px;
-            text-align: center;
-            position: relative;
-        }
-
-        #qrcode {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        #qrcode img {
-            border: 8px solid white;
-            border-radius: 4px;
-        }
-
-        .share-url-box {
-            background: #060a0f;
-            border: 1px solid #334155;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            word-break: break-all;
-            margin-bottom: 15px;
-            color: #94a3b8;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-        }
-
-        .btn-outline {
-            border: 1px solid #334155;
-            color: #cbd5e1;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .btn-outline:hover {
-            border-color: #60a5fa;
-            color: #60a5fa;
-            background: rgba(96, 165, 250, 0.1);
-        }
-
-        /* Card Template Styles */
-        #card-template {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 600px;
-            height: 1000px;
-            padding: 40px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            font-family: 'Exo 2', sans-serif;
-        }
-
-        .theme-default {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        }
-
-        .theme-res {
-            background: linear-gradient(135deg, #020617 0%, #1e3a8a 100%);
-            border: 2px solid #3b82f6;
-        }
-
-        .theme-enl {
-            background: linear-gradient(135deg, #022c22 0%, #14532d 100%);
-            border: 2px solid #22c55e;
-        }
-
-        .card-title {
-            text-align: center;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            color: #cbd5e1;
-        }
-
-        .card-title-l1 {
-            font-size: 20px;
-            font-weight: 400;
-            letter-spacing: 2px;
-            margin-bottom: 4px;
-        }
-
-        .card-title-l2 {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-
-        .card-agent {
-            font-size: 48px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
-        .theme-res .card-agent {
-            color: #60a5fa;
-            text-shadow: 0 0 20px rgba(96, 165, 250, 0.8);
-        }
-
-        .theme-enl .card-agent {
-            color: #4ade80;
-            text-shadow: 0 0 20px rgba(74, 222, 128, 0.8);
-        }
-
-        .card-badge {
-            width: 160px;
-            height: 160px;
-            margin-bottom: 5px;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
-            object-fit: contain;
-        }
-
-        .card-score {
-            font-size: 72px;
-            font-weight: 700;
-            margin-bottom: 30px;
-            font-family: 'Exo 2', sans-serif;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        .card-congrats {
-            font-size: 18px;
-            font-weight: 600;
-            color: #fbbf24;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-
-        .card-stats {
-            width: 100%;
-            flex-grow: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            align-content: start;
-        }
-
-        .stat-box {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-label {
-            font-size: 18px;
-            color: #94a3b8;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 600;
-        }
-
-        .stat-pct {
-            display: block;
-            font-size: 16px;
-            color: #94a3b8;
-            margin-top: 4px;
-            font-weight: normal;
-        }
-
-        .card-footer {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: auto;
-            text-align: center;
-            letter-spacing: 2px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .card-footer-url {
-            font-size: 16px;
-            opacity: 1;
-            margin-top: 8px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #cbd5e1;
-        }
-
-        #card-preview-container img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-    </style>
+    <link rel="stylesheet" href="utilities.css">
 </head>
 
 <body class="p-4 md:p-8">
@@ -477,7 +82,7 @@
         <!-- Sync Banner (Only shown if no data) -->
         <div id="sync-banner" style="display:none;"
             class="bg-blue-900/40 border border-blue-500 rounded-xl p-6 mb-8 text-center shadow-[0_0_20px_rgba(59,130,246,0.2)] relative z-20">
-            <button onclick="dismissBanner()"
+            <button onclick="dismissBanner()" aria-label="Dismiss sync banner"
                 class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -503,218 +108,227 @@
             <p id="page-subtitle" class="text-slate-400"></p>
         </header>
 
-        <!-- Placeholder View -->
-        <div id="placeholder-view" style="display:none;" class="text-center py-20">
-            <h2 id="ph-title" class="text-3xl sm:text-4xl font-bold mb-4 accent-blue"></h2>
-            <p id="ph-desc" class="text-slate-400 mb-8"></p>
-            <div id="ph-seasons" class="flex flex-col gap-3 max-w-sm mx-auto"></div>
-        </div>
+        <main id="main-content">
 
-        <div id="tracker-view">
-            <!-- Main Input & Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div class="ingress-card p-4 rounded-xl text-center total-input-box">
-                    <div id="label-input-total" class="text-blue-400 text-sm font-bold mb-2 uppercase"></div>
-                    <input type="number" id="global-total-actual"
-                        class="text-2xl font-bold bg-transparent border-none text-center focus:ring-0 w-full"
-                        placeholder="" value="0" oninput="updateGlobalTotal(this.value)"
-                        onchange="updateGlobalTotal(this.value)">
-                    <div id="label-input-hint" class="text-[10px] text-slate-500 mt-1"></div>
-                </div>
-                <div class="ingress-card p-4 rounded-xl text-center">
-                    <div id="label-planned-range" class="text-slate-400 text-sm mb-1"></div>
-                    <div id="planned-total-range" class="text-xl md:text-2xl font-bold accent-blue">0 - 0</div>
-                    <div id="planned-status" class="text-xs text-slate-500 mt-1"></div>
-                </div>
-                <div class="ingress-card p-4 rounded-xl text-center">
-                    <div id="label-next-tier" class="text-slate-400 text-sm mb-1"></div>
-                    <div id="next-tier-diff" class="text-3xl font-bold accent-purple">0</div>
-                    <div id="next-tier-name" class="text-xs text-slate-500 mt-1"></div>
-                </div>
+            <!-- Placeholder View -->
+            <div id="placeholder-view" style="display:none;" class="text-center py-20">
+                <h2 id="ph-title" class="text-3xl sm:text-4xl font-bold mb-4 accent-blue"></h2>
+                <p id="ph-desc" class="text-slate-400 mb-8"></p>
+                <div id="ph-seasons" class="flex flex-col gap-3 max-w-sm mx-auto"></div>
             </div>
 
-            <!-- Progress Bar -->
+            <div id="tracker-view">
+                <!-- Main Input & Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="ingress-card p-4 rounded-xl text-center total-input-box">
+                        <div id="label-input-total" class="text-blue-400 text-sm font-bold mb-2 uppercase"></div>
+                        <input type="number" id="global-total-actual"
+                            class="text-2xl font-bold bg-transparent border-none text-center focus:ring-0 w-full"
+                            placeholder="" value="0" oninput="updateGlobalTotal(this.value)"
+                            onchange="updateGlobalTotal(this.value)">
+                        <div id="label-input-hint" class="text-[10px] text-slate-500 mt-1"></div>
+                    </div>
+                    <div class="ingress-card p-4 rounded-xl text-center">
+                        <div id="label-planned-range" class="text-slate-400 text-sm mb-1"></div>
+                        <div id="planned-total-range" class="text-xl md:text-2xl font-bold accent-blue">0 - 0</div>
+                        <div id="planned-status" class="text-xs text-slate-500 mt-1"></div>
+                    </div>
+                    <div class="ingress-card p-4 rounded-xl text-center">
+                        <div id="label-next-tier" class="text-slate-400 text-sm mb-1"></div>
+                        <div id="next-tier-diff" class="text-3xl font-bold accent-purple">0</div>
+                        <div id="next-tier-name" class="text-xs text-slate-500 mt-1"></div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="ingress-card p-6 rounded-xl mb-8">
+                    <div id="badge-container"
+                        class="relative h-20 mb-4 font-semibold uppercase tracking-widest badge-label-container">
+                        <!-- Dynamically populated -->
+                    </div>
+                    <div id="progress-bar-container" class="progress-bar-container">
+                        <!-- Markers are dynamically populated -->
+                        <div id="main-progress-bar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Card Generation -->
+                <div id="card-module" class="ingress-card p-6 rounded-xl mb-8" style="display: none;">
+                    <h2 id="label-card" class="text-lg font-bold accent-purple mb-2 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span id="text-card-module"></span>
+                    </h2>
+                    <p id="card-motivation" class="text-sm text-slate-400 mb-4"></p>
+                    <div class="flex flex-col md:flex-row gap-4 items-center">
+                        <input type="text" id="agent-name-input"
+                            class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white w-full md:w-auto"
+                            placeholder="Agent Name">
+                        <select id="card-theme-select"
+                            class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white w-full md:w-auto">
+                            <option value="theme-default" id="opt-theme-default">Default (Dark)</option>
+                            <option value="theme-res" id="opt-theme-res">Resistance (Blue)</option>
+                            <option value="theme-enl" id="opt-theme-enl">Enlightened (Green)</option>
+                        </select>
+                        <button onclick="generateCard()"
+                            class="btn-primary w-full md:w-auto flex justify-center items-center"
+                            id="btn-generate-card">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Generate</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Activity Table -->
+                <div class="ingress-card rounded-xl overflow-hidden mb-8">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-800/50">
+                                <tr>
+                                    <th id="th-activity"
+                                        class="p-4 text-sm font-semibold text-slate-300 min-w-[120px] sm:min-w-[140px]">
+                                    </th>
+                                    <th id="th-max" class="p-4 text-sm font-semibold text-slate-300 hide-on-narrow">
+                                    </th>
+                                    <th id="th-planned" class="p-4 text-sm font-semibold text-slate-300"></th>
+                                    <th id="th-actual" class="p-4 text-sm font-semibold text-slate-300"></th>
+                                    <th id="th-updated" class="p-4 text-sm font-semibold text-slate-300 hide-on-mobile">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="activity-body">
+                                <!-- Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!-- End tracker-view -->
+
+            <!-- Data Migration -->
             <div class="ingress-card p-6 rounded-xl mb-8">
-                <div id="badge-container"
-                    class="relative h-20 mb-4 font-semibold uppercase tracking-widest badge-label-container">
-                    <!-- Dynamically populated -->
-                </div>
-                <div id="progress-bar-container" class="progress-bar-container">
-                    <!-- Markers are dynamically populated -->
-                    <div id="main-progress-bar" class="progress-fill" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <!-- Card Generation -->
-            <div id="card-module" class="ingress-card p-6 rounded-xl mb-8">
-                <h2 id="label-card" class="text-lg font-bold accent-purple mb-2 flex items-center">
+                <h2 id="label-migration" class="text-lg font-bold accent-blue mb-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
-                    <span id="text-card-module"></span>
+                    <span id="text-migration"></span>
                 </h2>
-                <p id="card-motivation" class="text-sm text-slate-400 mb-4"></p>
-                <div class="flex flex-col md:flex-row gap-4 items-center">
-                    <input type="text" id="agent-name-input"
-                        class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white w-full md:w-auto"
-                        placeholder="Agent Name">
-                    <select id="card-theme-select"
-                        class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white w-full md:w-auto">
-                        <option value="theme-default" id="opt-theme-default">Default (Dark)</option>
-                        <option value="theme-res" id="opt-theme-res">Resistance (Blue)</option>
-                        <option value="theme-enl" id="opt-theme-enl">Enlightened (Green)</option>
-                    </select>
-                    <button onclick="generateCard()"
-                        class="btn-primary w-full md:w-auto flex justify-center items-center" id="btn-generate-card">
+                <div id="migration-sync-options" class="flex flex-wrap gap-3 mb-4 border-b border-slate-700 pb-4">
+                    <button onclick="window.location.href='https://cyblocker.com/ingress/?request_export=true'"
+                        id="btn-sync-legacy"
+                        class="btn-primary flex items-center bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        <span>Generate</span>
+                        <span>Sync from Legacy Site</span>
+                    </button>
+                    <button id="btn-manual-import-card" onclick="manualImportData()"
+                        class="btn-outline flex items-center">
+                        <span id="btn-manual-import-card-text"></span>
                     </button>
                 </div>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="showShareModal()" class="btn-primary flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                        <span id="btn-share-url"></span>
+                    </button>
+                    <button onclick="exportDataToFile()" class="btn-outline flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span id="btn-export-json"></span>
+                    </button>
+                    <label class="btn-outline flex items-center cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        <span id="btn-import-json"></span>
+                        <input type="file" id="import-file" class="hidden" accept=".json"
+                            onchange="importDataFromFile(event)">
+                    </label>
+                </div>
             </div>
 
-            <!-- Activity Table -->
-            <div class="ingress-card rounded-xl overflow-hidden mb-8">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-800/50">
-                            <tr>
-                                <th id="th-activity" class="p-4 text-sm font-semibold text-slate-300 min-w-[120px] sm:min-w-[140px]">
-                                </th>
-                                <th id="th-max" class="p-4 text-sm font-semibold text-slate-300 hide-on-narrow"></th>
-                                <th id="th-planned" class="p-4 text-sm font-semibold text-slate-300"></th>
-                                <th id="th-actual" class="p-4 text-sm font-semibold text-slate-300"></th>
-                                <th id="th-updated" class="p-4 text-sm font-semibold text-slate-300 hide-on-mobile">
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="activity-body">
-                            <!-- Rows -->
-                        </tbody>
-                    </table>
+            <!-- Share Modal -->
+            <div id="shareModal" class="modal">
+                <div class="modal-content ingress-card">
+                    <h3 id="modal-share-title" class="text-xl font-bold accent-blue mb-2"></h3>
+                    <p id="modal-share-desc" class="text-slate-400 text-sm mb-4"></p>
+                    <div id="qrcode"></div>
+                    <div id="share-url" class="share-url-box"></div>
+                    <div class="flex gap-2 justify-center">
+                        <button onclick="copyShareUrl()" id="btn-copy-url" class="btn-primary text-sm"></button>
+                        <button onclick="closeModal('shareModal')" id="btn-close-modal"
+                            class="btn-outline text-sm"></button>
+                    </div>
                 </div>
             </div>
-        </div> <!-- End tracker-view -->
 
-        <!-- Data Migration -->
-        <div class="ingress-card p-6 rounded-xl mb-8">
-            <h2 id="label-migration" class="text-lg font-bold accent-blue mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                <span id="text-migration"></span>
-            </h2>
-            <div id="migration-sync-options" class="flex flex-wrap gap-3 mb-4 border-b border-slate-700 pb-4">
-                <button onclick="window.location.href='https://cyblocker.com/ingress/?request_export=true'"
-                    id="btn-sync-legacy"
-                    class="btn-primary flex items-center bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>Sync from Legacy Site</span>
-                </button>
-                <button id="btn-manual-import-card" onclick="manualImportData()" class="btn-outline flex items-center">
-                    <span id="btn-manual-import-card-text"></span>
-                </button>
+            <!-- Card Modal -->
+            <div id="cardModal" class="modal">
+                <div class="modal-content ingress-card" style="max-width: 450px;">
+                    <h3 id="modal-card-title" class="text-xl font-bold accent-purple mb-2"></h3>
+                    <p id="modal-card-desc" class="text-slate-400 text-sm mb-4"></p>
+                    <div id="card-preview-container" class="mb-6"></div>
+                    <div class="flex gap-2 justify-center">
+                        <button onclick="closeModal('cardModal')" id="btn-close-card"
+                            class="btn-outline text-sm"></button>
+                    </div>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-3">
-                <button onclick="showShareModal()" class="btn-primary flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                    <span id="btn-share-url"></span>
-                </button>
-                <button onclick="exportDataToFile()" class="btn-outline flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    <span id="btn-export-json"></span>
-                </button>
-                <label class="btn-outline flex items-center cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    <span id="btn-import-json"></span>
-                    <input type="file" id="import-file" class="hidden" accept=".json"
-                        onchange="importDataFromFile(event)">
-                </label>
-            </div>
-        </div>
 
-        <!-- Share Modal -->
-        <div id="shareModal" class="modal">
-            <div class="modal-content ingress-card">
-                <h3 id="modal-share-title" class="text-xl font-bold accent-blue mb-2"></h3>
-                <p id="modal-share-desc" class="text-slate-400 text-sm mb-4"></p>
-                <div id="qrcode"></div>
-                <div id="share-url" class="share-url-box"></div>
-                <div class="flex gap-2 justify-center">
-                    <button onclick="copyShareUrl()" id="btn-copy-url" class="btn-primary text-sm"></button>
-                    <button onclick="closeModal('shareModal')" id="btn-close-modal"
-                        class="btn-outline text-sm"></button>
+            <!-- Hidden Card Template -->
+            <div id="card-template" class="theme-default">
+                <div class="card-title">
+                    <div class="card-title-l1" id="ct-title-l1"></div>
+                    <div class="card-title-l2" id="ct-title-l2"></div>
+                </div>
+                <div class="card-agent" id="ct-agent">AGENT</div>
+                <div class="card-congrats" id="ct-congrats"></div>
+                <img src="" class="card-badge" id="ct-badge" style="display:none;">
+                <div class="card-score" id="ct-score">0</div>
+                <div class="card-stats">
+                    <div class="stat-box">
+                        <div class="stat-label" id="ctl-bounties">Bounties</div>
+                        <div class="stat-value" id="ct-bounties">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label" id="ctl-ifs">IFS</div>
+                        <div class="stat-value" id="ct-ifs">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label" id="ctl-events">Events & Ops</div>
+                        <div class="stat-value" id="ct-events">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label" id="ctl-anomaly">Anomaly</div>
+                        <div class="stat-value" id="ct-anomaly">0</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div id="ct-footer-text">GENERATED BY INGRESS SEASON PLANNER</div>
+                    <div class="card-footer-url">AgentsKit.org</div>
                 </div>
             </div>
-        </div>
-
-        <!-- Card Modal -->
-        <div id="cardModal" class="modal">
-            <div class="modal-content ingress-card" style="max-width: 450px;">
-                <h3 id="modal-card-title" class="text-xl font-bold accent-purple mb-2"></h3>
-                <p id="modal-card-desc" class="text-slate-400 text-sm mb-4"></p>
-                <div id="card-preview-container" class="mb-6"></div>
-                <div class="flex gap-2 justify-center">
-                    <button onclick="closeModal('cardModal')" id="btn-close-card" class="btn-outline text-sm"></button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Hidden Card Template -->
-        <div id="card-template" class="theme-default">
-            <div class="card-title">
-                <div class="card-title-l1" id="ct-title-l1"></div>
-                <div class="card-title-l2" id="ct-title-l2"></div>
-            </div>
-            <div class="card-agent" id="ct-agent">AGENT</div>
-            <div class="card-congrats" id="ct-congrats"></div>
-            <img src="" class="card-badge" id="ct-badge" style="display:none;">
-            <div class="card-score" id="ct-score">0</div>
-            <div class="card-stats">
-                <div class="stat-box">
-                    <div class="stat-label" id="ctl-bounties">Bounties</div>
-                    <div class="stat-value" id="ct-bounties">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label" id="ctl-ifs">IFS</div>
-                    <div class="stat-value" id="ct-ifs">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label" id="ctl-events">Events & Ops</div>
-                    <div class="stat-value" id="ct-events">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label" id="ctl-anomaly">Anomaly</div>
-                    <div class="stat-value" id="ct-anomaly">0</div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <div id="ct-footer-text">GENERATED BY INGRESS SEASON PLANNER</div>
-                <div class="card-footer-url">AgentsKit.org</div>
-            </div>
-        </div>
+        </main>
 
         <footer class="text-center text-slate-500 text-sm mb-12">
             <p id="footer-source"></p>
@@ -725,1131 +339,6 @@
             </div>
         </footer>
     </div>
-    <script>
-        // ==================== I18N ====================
-        const I18N = {
-            zh: {
-                phTitle: 'Ingress 赛季计划工具',
-                phDesc: '敬请期待新赛季！在此期间，您可以回顾以下历史赛季：',
-                inputTotal: '输入游戏内当前总分',
-                inputPlaceholder: '点击输入',
-                inputHint: 'Season Tokens 统计值',
-                plannedRange: '计划最终获得区间',
-                calculatingStatus: '根据潜力计算中...',
-                nextTierLabel: '下一等级还差',
-                loading: '加载中...',
-                thActivity: '活动项目',
-                thMax: '单项最大值',
-                thPlanned: '计划完成度',
-                thActual: '实际完成(计算/输入)',
-                thUpdated: '最后更新',
-                footerFormula: '每日任务得分 = 总分 - 其他项目实得分之和。',
-                seeRange: '请见最终得分区间',
-                daysCompleted: (d) => `约完成 ${d} 天`,
-                bountyHint: (p) => `明天起至季末最高还可得: ${p} tokens`,
-                reachedPlatinum: '已达成 Platinum!',
-                toTier: (name) => `距离 ${name} 勋章`,
-                maxTierForecast: (name) => `最高预计可获 ${name} 勋章`,
-                noTierForecast: '预计不足以获得勋章',
-                localTime: '本地时间',
-                contactMe: '联系我：',
-                textMigration: '数据迁移',
-                btnShareUrl: '分享链接 & 二维码',
-                btnExportJson: '导出 JSON 文件',
-                btnImportJson: '导入 JSON 文件',
-                modalShareTitle: '数据分享',
-                modalShareDesc: '扫码或复制链接在其他设备上同步您的计划。',
-                btnClose: '关闭',
-                btnCopy: '复制链接',
-                copySuccess: '链接已复制到剪贴板',
-                syncConfirm: '检测到同步数据，是否覆盖本地记录？',
-                importSuccess: '导入成功！',
-                invalidData: '无效的数据格式！',
-                wrongSeason: (s) => `此数据属于其他赛季 (${s})，是否仍要导入？`,
-                confirmMergeAllSeasons: '检测到多赛季全量数据，是否覆盖本地所有赛季记录？',
-                textCardModule: '赛季纪念卡片',
-                agentPlaceholder: '特工代号 (Agent Name)',
-                optThemeDefault: '默认 (深色)',
-                optThemeRes: '抵抗军 (蓝色)',
-                optThemeEnl: '启蒙军 (绿色)',
-                btnGenerateCard: '生成纪念卡片',
-                modalCardTitle: '保存纪念卡片',
-                modalCardDesc: '生成完成！电脑上可右键另存为，手机上长按下方图片保存到相册，或分享给朋友。',
-                statBounties: '每日任务',
-                statIFS: 'IFS (First Saturday)',
-                statEvents: '现场活动与行动',
-                statAnomaly: 'Anomaly 现场',
-                pctComplete: (p) => `目标完成 ${p}%`,
-                bountyComplete: (p) => `完成 ${p}%`,
-                congratsCardMsg: (t) => `获得 ${t} 奖牌！`,
-                motivationBadge: (t) => `恭喜您已达成 ${t} 奖牌，快来生成纪念卡片分享一下吧！`,
-                motivationNormal: '赛季即将结束，来生成一张专属您的赛季成绩卡片吧！',
-                startsIn: (t) => `${t} 后开始`,
-                endsIn: (t) => `${t} 后结束`,
-                ended: '已结束',
-                unitDay: '天',
-                unitHour: '小时',
-                unitMinute: '分',
-                max_anomaly: '单项限制见说明',
-                btnSyncLegacy: '从旧版网站同步',
-                btnManualImportStr: '手动导入旧版网站数据',
-                migNoDataFound: '在迁移数据中未找到 2026 Q2 Orion 的数据。',
-                migOverwriteConfirm: '发现现有 2026 Q2 Orion 记录。是否覆盖为来自 cyblocker.com/ingress 的旧数据？警告：此操作无法撤销。',
-                migSuccess: '迁移成功！您的旧数据已导入。',
-                promptManualImport: '粘贴手动导出文本（以 AGENTSKIT_ 开头）：',
-                migInvalidFormatStr: '格式无效。文本必须以 AGENTSKIT_ 开头',
-                migBannerTitle: '新赛季数据迁移',
-                migBannerDesc: '检测到您尚未在 Agents Kit 记录数据。如果您有旧站点的记录，可以通过以下方式快速同步。',
-                limitLabel: '上限',
-            },
-            en: {
-                phTitle: 'Ingress Season Planner',
-                phDesc: 'Please look forward to the new season! Meanwhile, review past seasons below:',
-                inputTotal: 'Enter Current In-Game Total',
-                inputPlaceholder: 'Click to enter',
-                inputHint: 'Season Tokens total',
-                plannedRange: 'Projected Final Range',
-                calculatingStatus: 'Calculating based on potential...',
-                nextTierLabel: 'Until Next Tier',
-                loading: 'Loading...',
-                thActivity: 'Activity',
-                thMax: 'Max Tokens',
-                thPlanned: 'Planned',
-                thActual: 'Actual (Calc/Input)',
-                thUpdated: 'Last Updated',
-                footerFormula: 'Daily bounty score = Total - sum of all other actual scores.',
-                seeRange: 'See projected range',
-                daysCompleted: (d) => `~${d} days completed`,
-                bountyHint: (p) => `Max remaining from tomorrow to season end: ${p} tokens`,
-                reachedPlatinum: 'Platinum Achieved!',
-                toTier: (name) => `Until ${name} Badge`,
-                maxTierForecast: (name) => `Projected max: ${name} Badge`,
-                noTierForecast: 'Not enough for any badge',
-                localTime: 'local time',
-                contactMe: 'Contact Me: ',
-                textMigration: 'Data Migration',
-                btnShareUrl: 'Share Link & QR',
-                btnExportJson: 'Export JSON',
-                btnImportJson: 'Import JSON',
-                modalShareTitle: 'Share Data',
-                modalShareDesc: 'Scan the QR or copy the link to sync your plan on other devices.',
-                btnClose: 'Close',
-                btnCopy: 'Copy Link',
-                copySuccess: 'Link copied to clipboard',
-                syncConfirm: 'Sync data detected. Overwrite local records?',
-                importSuccess: 'Import successful!',
-                invalidData: 'Invalid data format!',
-                wrongSeason: (s) => `This data belongs to another season (${s}). Import anyway?`,
-                confirmMergeAllSeasons: 'Multi-season data detected. Overwrite all local season records?',
-                textCardModule: 'Commemorative Card',
-                agentPlaceholder: 'Agent Name',
-                optThemeDefault: 'Default (Dark)',
-                optThemeRes: 'Resistance (Blue)',
-                optThemeEnl: 'Enlightened (Green)',
-                btnGenerateCard: 'Generate Card',
-                modalCardTitle: 'Save Commemorative Card',
-                modalCardDesc: 'Card generated! Right-click to save on PC, or long-press the image on mobile devices.',
-                statBounties: 'Bounties',
-                statIFS: 'IFS (First Saturday)',
-                statEvents: 'Events & Ops',
-                statAnomaly: 'Anomaly',
-                pctComplete: (p) => `${p}% of Target`,
-                bountyComplete: (p) => `${p}% Complete`,
-                congratsCardMsg: (t) => `${t} Badge Earned!`,
-                motivationBadge: (t) => `Congratulations on reaching the ${t} badge! Generate a card to share it!`,
-                motivationNormal: 'The season is coming to a close. Generate your personalized commemorative card!',
-                startsIn: (t) => `Starts in ${t}`,
-                endsIn: (t) => `Ends in ${t}`,
-                ended: 'Ended',
-                unitDay: 'd',
-                unitHour: 'h',
-                unitMinute: 'm',
-                max_anomaly: 'See desc for limits',
-                btnSyncLegacy: 'Sync from Legacy Site',
-                btnManualImportStr: 'Manual Import String',
-                migNoDataFound: 'No 2026 Q2 Orion data found in the migration payload.',
-                migOverwriteConfirm: 'Found existing record. Overwrite with legacy data from cyblocker.com/ingress? WARNING: This cannot be undone.',
-                migSuccess: 'Migration successful! Your legacy data has been imported.',
-                promptManualImport: 'Paste the manual export string (starting with AGENTSKIT_):',
-                migInvalidFormatStr: 'Invalid format. The string must start with AGENTSKIT_',
-                migBannerTitle: 'Data Migration',
-                migBannerDesc: 'It seems you haven\'t recorded any data on Agents Kit yet. If you have records on the legacy site, you can sync them now.',
-                limitLabel: 'Limit',
-            },
-            ja: {
-                phTitle: 'Ingress シーズンプランナー',
-                phDesc: '新シーズンにご期待ください！その間、以下の過去のシーズンを振り返ることができます：',
-                inputTotal: 'ゲーム内の現在の総トークンを入力',
-                inputPlaceholder: 'クリックして入力',
-                inputHint: 'Season Tokens 合計値',
-                plannedRange: '予想獲得トークン範囲',
-                calculatingStatus: 'ポテンシャルから計算中...',
-                nextTierLabel: '次のランクまで',
-                loading: '読み込み中...',
-                thActivity: 'OP/イベント',
-                thMax: '最大値',
-                thPlanned: '計画',
-                thActual: '実績（計算/入力）',
-                thUpdated: '最終更新',
-                footerFormula: 'デイリータスクトークン = 総トークン - 他項目の実績合計',
-                seeRange: '予想範囲を参照',
-                daysCompleted: (d) => `約${d}日完了`,
-                bountyHint: (p) => `明日からシーズン終了までの最大獲得可能数: ${p} tokens`,
-                reachedPlatinum: 'Platinum 達成！',
-                toTier: (name) => `${name} メダルまであと`,
-                maxTierForecast: (name) => `予想される最大メダル: ${name}`,
-                noTierForecast: 'メダル獲得には不十分と予想されます',
-                localTime: '現地時間',
-                contactMe: '連絡先：',
-                textMigration: 'データ移行',
-                btnShareUrl: 'リンク & QRコードを共有',
-                btnExportJson: 'JSONをエクスポート',
-                btnImportJson: 'JSONをインポート',
-                modalShareTitle: 'データ共有',
-                modalShareDesc: 'QRコードをスキャンするか、リンクをコピーして他のデバイスと同期します。',
-                btnClose: '閉じる',
-                btnCopy: 'リンクをコピー',
-                copySuccess: 'リンクをクリップボードにコピーしました',
-                syncConfirm: '同期データが検出されました。ローカルの記録を上書きしますか？',
-                importSuccess: 'インポート成功！',
-                invalidData: '無効なデータ形式です！',
-                wrongSeason: (s) => `このデータは別のシーズン (${s}) のものです。インポートしますか？`,
-                confirmMergeAllSeasons: '複数シーズンのデータを検出しました。ローカルの全記録を上書きしますか？',
-                textCardModule: '記念カード生成',
-                agentPlaceholder: 'エージェント名 (AG)',
-                optThemeDefault: 'デフォルト (ダーク)',
-                optThemeRes: 'レジスタンス (青)',
-                optThemeEnl: 'エンライテンド (緑)',
-                btnGenerateCard: 'カードを生成',
-                modalCardTitle: '記念カードを保存',
-                modalCardDesc: '生成完了！PCでは右クリック、スマートフォンでは画像を長押しして保存してください。',
-                statBounties: 'デイリーバウンティ',
-                statIFS: 'IFS (First Saturday)',
-                statEvents: 'イベント & OP',
-                statAnomaly: 'アノマリー',
-                pctComplete: (p) => `計画達成率 ${p}%`,
-                bountyComplete: (p) => `達成率 ${p}%`,
-                congratsCardMsg: (t) => `${t} メダル獲得！`,
-                motivationBadge: (t) => `${t} メダル獲得おめでとうございます！記念カードを生成してシェアしましょう！`,
-                motivationNormal: 'シーズンが終了に近づいています。あなただけの記念カードを作りましょう！',
-                startsIn: (t) => `あと ${t} で開始`,
-                endsIn: (t) => `あと ${t} で終了`,
-                ended: '終了',
-                unitDay: '日',
-                unitHour: '時間',
-                unitMinute: '分',
-                max_anomaly: '詳細は説明を参照',
-                btnSyncLegacy: '旧サイトから同期',
-                btnManualImportStr: '文字列を手動インポート',
-                migNoDataFound: '移行データに 2026 Q2 Orion のデータが見つかりませんでした。',
-                migOverwriteConfirm: '既存の記録が見つかりました。cyblocker.com/ingress の旧データで上書きしますか？ 警告: この操作は元に戻せません。',
-                migSuccess: '移行に成功しました！旧データがインポートされました。',
-                promptManualImport: '手動エクスポート用の文字列（AGENTSKIT_ で始まる）を貼り付けてください：',
-                migInvalidFormatStr: '無効な形式です。文字列は AGENTSKIT_ で始まる必要があります',
-                migBannerTitle: 'データ移行',
-                migBannerDesc: 'Agents Kit にまだデータが記録されていないようです。旧サイトに記録がある場合は、今すぐ同期できます。',
-                limitLabel: '上限',
-            }
-        };
-
-        function detectLanguage() {
-            const saved = localStorage.getItem('agentskit_lang');
-            if (saved) return saved;
-
-            const browserLangs = navigator.languages || [navigator.language];
-            for (const lang of browserLangs) {
-                const short = lang.split('-')[0].toLowerCase();
-                if (I18N[short]) return short;
-            }
-            return 'en';
-        }
-
-        let currentLang = detectLanguage();
-
-        function t(key) {
-            let seasonI18n = SEASON_DB[activeSeasonId]?.i18n;
-            if (seasonI18n && seasonI18n[currentLang] && seasonI18n[currentLang][key]) {
-                return seasonI18n[currentLang][key];
-            }
-            if (I18N[currentLang] && I18N[currentLang][key]) {
-                return I18N[currentLang][key];
-            }
-            return typeof I18N['en'][key] === 'function' ? I18N['en'][key] : key;
-        }
-
-        function formatTimeRemaining(ms) {
-            const totalMinutes = Math.floor(ms / (1000 * 60));
-            const totalHours = Math.floor(totalMinutes / 60);
-            const days = Math.floor(totalHours / 24);
-            const hours = totalHours % 24;
-            const mins = totalMinutes % 60;
-
-            if (days > 0) {
-                return `${days}${t('unitDay')} ${hours}${t('unitHour')} ${mins}${t('unitMinute')}`;
-            } else if (hours > 0) {
-                return `${hours}${t('unitHour')} ${mins}${t('unitMinute')}`;
-            } else {
-                return `${mins}${t('unitMinute')}`;
-            }
-        }
-
-        // ==================== DATA & STATE ====================
-        const GLOBAL_STORAGE_KEY = 'ingress_planner_all_seasons';
-
-        let activeSeasonId = CURRENT_SEASON_ID;
-        let TIERS = [];
-        let ACTIVITIES = [];
-        let SEASON_END = new Date();
-
-        let allSeasonsData = {};
-        let userData = {};
-
-        function loadAllSeasonsData() {
-            const saved = localStorage.getItem(GLOBAL_STORAGE_KEY);
-            if (saved) {
-                allSeasonsData = JSON.parse(saved);
-            } else {
-                // Migration logic chain
-                const seasonKey = 'ingress_planner_data_' + CURRENT_SEASON_ID;
-                const legacyKey = 'ingress_orion_planner_v3';
-
-                const migratedData = localStorage.getItem(seasonKey) || localStorage.getItem(legacyKey);
-                if (migratedData) {
-                    allSeasonsData[CURRENT_SEASON_ID] = JSON.parse(migratedData);
-                    localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
-                }
-            }
-        }
-
-        loadAllSeasonsData();
-
-        function updateSyncButtonVisibility() {
-            const btnSync = document.getElementById('btn-sync-legacy');
-            const btnManual = document.getElementById('btn-manual-import-card');
-            if (!btnSync) return;
-
-            const existingLocalData = allSeasonsData['2026_q2_orion'];
-            const hasData = existingLocalData && (existingLocalData.globalTotal > 0 || Object.keys(existingLocalData.activities).length > 0);
-
-            if (hasData) {
-                btnSync.className = 'btn-outline flex items-center text-xs opacity-70';
-                if (btnManual) btnManual.className = 'btn-outline flex items-center text-xs opacity-70';
-            } else {
-                btnSync.className = 'btn-primary flex items-center bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(34,197,94,0.4)]';
-                if (btnManual) btnManual.className = 'btn-outline flex items-center';
-            }
-        }
-
-        function updateBannerVisibility() {
-            const banner = document.getElementById('sync-banner');
-            if (!banner) return;
-
-            const existingLocalData = allSeasonsData['2026_q2_orion'];
-            const hasData = existingLocalData && (existingLocalData.globalTotal > 0 || Object.keys(existingLocalData.activities).length > 0);
-
-            // If data exists, permanently dismiss the banner
-            if (hasData) {
-                localStorage.setItem('agentskit_banner_dismissed', 'true');
-            }
-
-            const isDismissed = localStorage.getItem('agentskit_banner_dismissed') === 'true';
-
-            if (!hasData && !isDismissed) {
-                banner.style.display = 'block';
-            } else {
-                banner.style.display = 'none';
-            }
-        }
-
-        window.dismissBanner = function () {
-            localStorage.setItem('agentskit_banner_dismissed', 'true');
-            updateBannerVisibility();
-        }
-
-        function init() {
-            checkMigrationHash();
-            initLangToggle();
-            initContact();
-            checkHashData();
-            updateSyncButtonVisibility();
-            updateBannerVisibility();
-
-            if (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID]) {
-                document.getElementById('tracker-view').style.display = 'none';
-                document.getElementById('placeholder-view').style.display = 'block';
-
-                // Hide Migration Options in placeholder view
-                const migrationOptions = document.getElementById('migration-sync-options');
-                if (migrationOptions) migrationOptions.style.display = 'none';
-
-                document.getElementById('page-title').style.display = 'none';
-                document.getElementById('page-subtitle').style.display = 'none';
-                document.getElementById('footer-source').style.display = 'none';
-                document.getElementById('footer-formula').style.display = 'none';
-                renderPlaceholder();
-            } else {
-                activeSeasonId = CURRENT_SEASON_ID;
-                initSeason(activeSeasonId);
-            }
-            applyLanguage();
-        }
-
-        function renderPlaceholder() {
-            const phSeasons = document.getElementById('ph-seasons');
-            phSeasons.innerHTML = '';
-            Object.values(SEASON_DB).forEach(season => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-outline text-left py-3 px-4 flex justify-between items-center';
-
-                let badgeHtml = '';
-                if (allSeasonsData[season.id]) {
-                    const total = allSeasonsData[season.id].globalTotal || 0;
-                    const earnedTier = [...season.tiers].reverse().find(t => total >= t.value);
-                    if (earnedTier) {
-                        const imgSrc = season.badgePath + earnedTier.name.toLowerCase() + '.png';
-                        badgeHtml = `<img src="${imgSrc}" class="h-6 w-6 ml-2" alt="${earnedTier.name}">`;
-                    }
-                }
-
-                btn.innerHTML = `<div class="flex items-center text-left"><span>${season.name}</span>${badgeHtml}</div> <span class="ml-2 flex-shrink-0">→</span>`;
-                btn.onclick = () => {
-                    activeSeasonId = season.id;
-                    initSeason(activeSeasonId);
-                };
-                phSeasons.appendChild(btn);
-            });
-        }
-
-        function switchSeason(id) {
-            if (id) {
-                activeSeasonId = id;
-                initSeason(id);
-            }
-        }
-
-        function initSeason(id) {
-            document.getElementById('placeholder-view').style.display = 'none';
-            document.getElementById('tracker-view').style.display = 'block';
-
-            // Show/Hide Migration Options (Only for Orion season migration)
-            const migrationOptions = document.getElementById('migration-sync-options');
-            if (migrationOptions) {
-                migrationOptions.style.display = (id === '2026_q2_orion') ? 'flex' : 'none';
-            }
-
-            document.getElementById('page-title').style.display = 'block';
-            document.getElementById('page-subtitle').style.display = 'block';
-            document.getElementById('footer-source').style.display = 'block';
-            document.getElementById('footer-formula').style.display = 'block';
-
-            const season = SEASON_DB[id];
-            TIERS = season.tiers;
-            ACTIVITIES = season.activities;
-            SEASON_END = new Date(season.endTime);
-
-            // Populate selector
-            const selector = document.getElementById('season-selector');
-            selector.innerHTML = '';
-            if (Object.keys(SEASON_DB).length > 1) {
-                Object.values(SEASON_DB).forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.id;
-                    opt.textContent = s.name;
-                    if (s.id === id) opt.selected = true;
-                    selector.appendChild(opt);
-                });
-                selector.style.display = 'inline-block';
-            } else {
-                selector.style.display = 'none';
-            }
-
-            // Show/Hide Card UI based on configuration
-            const cardModule = document.getElementById('card-module');
-            if (cardModule) {
-                if (id === CURRENT_SEASON_ID) {
-                    cardModule.style.display = season.cardEnabled ? 'block' : 'none';
-                } else {
-                    cardModule.style.display = 'block'; // Always show for past seasons
-                }
-            }
-
-            // Set current working data
-            if (!allSeasonsData[id]) {
-                allSeasonsData[id] = { globalTotal: 0, activities: {} };
-            }
-            userData = allSeasonsData[id];
-
-            document.getElementById('global-total-actual').value = userData.globalTotal || 0;
-            renderProgressBarUI(season);
-            applyLanguage();
-            renderTable();
-            calculate();
-        }
-
-        function renderProgressBarUI(season) {
-            const badgeContainer = document.getElementById('badge-container');
-            const progressContainer = document.getElementById('progress-bar-container');
-
-            badgeContainer.innerHTML = '';
-            Array.from(progressContainer.querySelectorAll('.badge-marker')).forEach(m => m.remove());
-
-            if (!TIERS || TIERS.length === 0) return;
-            const maxTierValue = TIERS[TIERS.length - 1].value;
-
-            TIERS.forEach((tier, index) => {
-                const isLast = index === TIERS.length - 1;
-                const pct = (tier.value / maxTierValue) * 100;
-
-                const div = document.createElement('div');
-                div.className = 'absolute text-center transition-all duration-300 badge-item';
-                div.style.left = pct + '%';
-                div.style.transform = isLast ? 'translateX(-100%)' : 'translateX(-50%)';
-                div.style.top = '0';
-
-                const imgSrc = season.badgePath + tier.name.toLowerCase() + '.png';
-                const formatValue = tier.value >= 1000 ? (tier.value / 1000) + 'k' : tier.value;
-                const color = tier.color || 'rgba(255,255,255,0.5)';
-
-                div.innerHTML = `
-                    <img src="${imgSrc}" class="w-10 h-10 mx-auto" style="filter: drop-shadow(0 0 5px ${color})" alt="${tier.name}">
-                    <span class="text-[10px] whitespace-nowrap mt-1 block">${tier.name} (${formatValue})</span>
-                `;
-                badgeContainer.appendChild(div);
-
-                const marker = document.createElement('div');
-                marker.className = 'badge-marker';
-                marker.style.left = pct + '%';
-                progressContainer.insertBefore(marker, document.getElementById('main-progress-bar'));
-            });
-        }
-
-
-        // ==================== LANGUAGE TOGGLE ====================
-        function initLangToggle() {
-            const toggle = document.getElementById('lang-toggle');
-            toggle.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.lang === currentLang);
-                btn.addEventListener('click', () => {
-                    currentLang = btn.dataset.lang;
-                    localStorage.setItem('agentskit_lang', currentLang);
-                    toggle.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
-                    applyLanguage();
-                });
-            });
-        }
-
-        function applyLanguage() {
-            const langMap = { zh: 'zh-CN', en: 'en', ja: 'ja' };
-            document.documentElement.lang = langMap[currentLang] || currentLang;
-
-            if (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID] || activeSeasonId !== CURRENT_SEASON_ID) {
-                document.getElementById('ph-title').textContent = t('phTitle');
-                document.getElementById('ph-desc').textContent = t('phDesc');
-            }
-
-            // Static UI elements
-            document.getElementById('page-title').textContent = t('pageTitle');
-            document.getElementById('page-subtitle').textContent = t('pageSubtitle');
-            document.getElementById('label-input-total').textContent = t('inputTotal');
-            document.getElementById('global-total-actual').placeholder = t('inputPlaceholder');
-            document.getElementById('label-input-hint').textContent = t('inputHint');
-            document.getElementById('label-planned-range').textContent = t('plannedRange');
-            document.getElementById('label-next-tier').textContent = t('nextTierLabel');
-
-            // Table headers
-            document.getElementById('th-activity').textContent = t('thActivity');
-            document.getElementById('th-max').textContent = t('thMax');
-            document.getElementById('th-planned').textContent = t('thPlanned');
-            document.getElementById('th-actual').textContent = t('thActual');
-            document.getElementById('th-updated').textContent = t('thUpdated');
-
-            // Footer
-            document.getElementById('footer-source').textContent = t('footerSource');
-            document.getElementById('footer-formula').textContent = t('footerFormula');
-            document.getElementById('label-contact').textContent = t('contactMe');
-
-            // Data Migration & Card UI
-            document.getElementById('text-migration').textContent = t('textMigration');
-            document.getElementById('btn-share-url').textContent = t('btnShareUrl');
-            document.getElementById('btn-export-json').textContent = t('btnExportJson');
-            document.getElementById('btn-import-json').textContent = t('btnImportJson');
-            document.getElementById('modal-share-title').textContent = t('modalShareTitle');
-            document.getElementById('modal-share-desc').textContent = t('modalShareDesc');
-            document.getElementById('btn-close-modal').textContent = t('btnClose');
-            document.getElementById('btn-copy-url').textContent = t('btnCopy');
-
-            document.getElementById('text-card-module').textContent = t('textCardModule');
-            document.getElementById('agent-name-input').placeholder = t('agentPlaceholder');
-            document.getElementById('opt-theme-default').textContent = t('optThemeDefault');
-            document.getElementById('opt-theme-res').textContent = t('optThemeRes');
-            document.getElementById('opt-theme-enl').textContent = t('optThemeEnl');
-            document.getElementById('btn-generate-card').querySelector('span').textContent = t('btnGenerateCard');
-
-            document.getElementById('modal-card-title').textContent = t('modalCardTitle');
-            document.getElementById('modal-card-desc').textContent = t('modalCardDesc');
-            document.getElementById('btn-close-card').textContent = t('btnClose');
-
-            document.getElementById('ctl-bounties').textContent = t('statBounties');
-            document.getElementById('ctl-ifs').textContent = t('statIFS');
-            document.getElementById('ctl-events').textContent = t('statEvents');
-            document.getElementById('ctl-anomaly').textContent = t('statAnomaly');
-
-            const elBannerTitle = document.getElementById('mig-banner-title'); if (elBannerTitle) elBannerTitle.textContent = t('migBannerTitle');
-            const elBannerDesc = document.getElementById('mig-banner-desc'); if (elBannerDesc) elBannerDesc.textContent = t('migBannerDesc');
-            const elBtnSyncBanner = document.getElementById('btn-sync-legacy-banner'); if (elBtnSyncBanner) elBtnSyncBanner.textContent = t('btnSyncLegacy');
-            const elBtnManualBanner = document.getElementById('btn-manual-import-banner'); if (elBtnManualBanner) elBtnManualBanner.textContent = t('btnManualImportStr');
-
-            const elBtnSyncLegacy = document.getElementById('btn-sync-legacy'); if (elBtnSyncLegacy) elBtnSyncLegacy.querySelector('span').textContent = t('btnSyncLegacy');
-
-            // Manual import btn doesn't have an ID but it is the next sibling of sync btn or can just be selected
-            const elBtnManualCard = document.getElementById('btn-manual-import-card-text'); if (elBtnManualCard) elBtnManualCard.textContent = t('btnManualImportStr');
-
-            // Title tag
-            const isPlaceholder = document.getElementById('placeholder-view').style.display === 'block';
-            if (isPlaceholder) {
-                document.title = t('phTitle');
-            } else {
-                const titleText = t('pageTitle');
-                const formattedWords = titleText.split(' ').map(w => {
-                    if (!w) return w;
-                    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-                });
-                document.title = 'Ingress ' + formattedWords.join(' ');
-            }
-
-            // Re-render dynamic content
-            renderTable();
-            calculate();
-        }
-
-        // ==================== LOGIC ====================
-        function getRemainingBountyPotential() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-
-            if (tomorrow > SEASON_END) return 0;
-            const diffDays = Math.ceil((SEASON_END - tomorrow) / (1000 * 60 * 60 * 24));
-            return Math.max(0, diffDays) * 80;
-        }
-
-        function initContact() {
-            const el = document.getElementById('email-link');
-            if (!el) return;
-            // Obfuscated email to prevent simple scrapers
-            const parts = [105, 110, 103, 114, 101, 115, 115, 64, 99, 121, 98, 108, 111, 99, 107, 101, 114, 46, 99, 111, 109];
-            const email = parts.map(c => String.fromCharCode(c)).join('');
-            el.href = 'mailto:' + email;
-            el.textContent = email;
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('activity-body');
-            tbody.innerHTML = '';
-            const potential = getRemainingBountyPotential();
-
-            let otherActualSum = 0;
-            ACTIVITIES.forEach(act => {
-                if (!act.isBounty) {
-                    otherActualSum += (userData.activities[act.id]?.actual || 0);
-                }
-            });
-
-            const calculatedBounty = Math.max(0, (userData.globalTotal || 0) - otherActualSum);
-
-            ACTIVITIES.forEach(act => {
-                const stored = userData.activities[act.id] || { planned: 0, actual: 0, lastUpdate: '-' };
-                const row = document.createElement('tr');
-                row.className = 'border-t border-slate-800 hover:bg-slate-800/30 transition-colors';
-
-                let plannedInput = '';
-                let actualInput = '';
-                let hint = '';
-
-                // Build description
-                let displayDesc = act.descKey ? t(act.descKey) : '';
-                if (act.utcStart && act.utcEnd) {
-                    const start = new Date(act.utcStart);
-                    const end = new Date(act.utcEnd);
-                    const now = new Date();
-                    const fmt = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
-                    displayDesc = `${start.toLocaleString([], fmt)} - ${end.toLocaleString([], fmt)} (${t('localTime')})`;
-
-                    let statusBadge = '';
-                    if (now < start) {
-                        const diff = start - now;
-                        statusBadge = `<div class="mt-1 text-[10px] text-cyan-400 font-semibold uppercase tracking-wider">${t('startsIn')(formatTimeRemaining(diff))}</div>`;
-                    } else if (now < end) {
-                        const diff = end - now;
-                        statusBadge = `<div class="mt-1 text-[10px] text-amber-400 font-semibold uppercase tracking-wider animate-pulse">${t('endsIn')(formatTimeRemaining(diff))}</div>`;
-                    } else {
-                        statusBadge = `<div class="mt-1 text-[10px] text-rose-500 font-semibold uppercase tracking-wider opacity-70">${t('ended')}</div>`;
-                    }
-                    displayDesc += statusBadge;
-                }
-
-                if (act.isBounty) {
-                    plannedInput = `<span class="text-slate-600 italic text-sm">${t('seeRange')}</span>`;
-                    actualInput = `
-                        <div class="flex flex-col">
-                            <span class="text-green-400 font-mono font-bold text-lg">${calculatedBounty}</span>
-                            <div class="text-[10px] text-slate-500 mt-1">${t('daysCompleted')(Math.floor(calculatedBounty / 80))}</div>
-                        </div>
-                    `;
-                    hint = `<div class="bounty-hint">${t('bountyHint')(potential)}</div>`;
-                } else {
-                    plannedInput = `
-                        <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
-                               onchange="updateValue('${act.id}', 'planned', this.value)">
-                    `;
-                    actualInput = `
-                        <input type="number" min="0" max="${act.max}" value="${stored.actual}" 
-                               onchange="updateValue('${act.id}', 'actual', this.value)">
-                    `;
-                }
-
-                const displayMax = (act.id === 'anomaly') ? t('max_anomaly') : act.max;
-
-                row.innerHTML = `
-                    <td class="p-4">
-                        <div class="font-semibold text-slate-200 text-sm sm:text-base">${t(act.nameKey)}</div>
-                        <div class="show-on-narrow text-[10px] sm:text-xs text-slate-400 font-mono mt-0.5">${t('limitLabel')}: ${displayMax}</div>
-                        <div class="text-[10px] sm:text-xs text-slate-500">${displayDesc}</div>
-                        ${hint}
-                    </td>
-                    <td class="p-4 text-slate-400 font-mono text-xs sm:text-sm hide-on-narrow">${displayMax}</td>
-                    <td class="p-4">${plannedInput}</td>
-                    <td class="p-4">${actualInput}</td>
-                    <td class="p-4 hide-on-mobile">
-                        <div id="time-${act.id}" class="timestamp font-mono">${stored.lastUpdate}</div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        window.updateGlobalTotal = function (val) {
-            userData.globalTotal = parseInt(val) || 0;
-            saveAndRefresh();
-        }
-
-        window.updateValue = function (id, type, value) {
-            if (!userData.activities[id]) {
-                userData.activities[id] = { planned: 0, actual: 0, lastUpdate: '-' };
-            }
-
-            userData.activities[id][type] = parseInt(value) || 0;
-
-            const now = new Date();
-            userData.activities[id].lastUpdate = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            saveAndRefresh();
-        };
-
-        function saveAndRefresh() {
-            allSeasonsData[CURRENT_SEASON_ID] = userData;
-            localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
-            renderTable();
-            calculate();
-        }
-
-        function calculate() {
-            let totalActual = userData.globalTotal || 0;
-            let otherPlannedSum = 0;
-
-            ACTIVITIES.forEach(act => {
-                if (!act.isBounty) {
-                    const stored = userData.activities[act.id] || { planned: 0, actual: 0 };
-                    let valToUse = stored.planned;
-
-                    const now = new Date();
-                    const hasEnded = act.utcEnd && now > new Date(act.utcEnd);
-
-                    // If actual > planned, use actual.
-                    // If activity ended, use actual regardless of planned.
-                    if (stored.actual > stored.planned || hasEnded) {
-                        valToUse = stored.actual;
-                    }
-
-                    otherPlannedSum += valToUse;
-                }
-            });
-
-            const potential = getRemainingBountyPotential();
-
-            let otherActualSum = 0;
-            ACTIVITIES.forEach(act => { if (!act.isBounty) otherActualSum += (userData.activities[act.id]?.actual || 0); });
-            const currentBountyActual = Math.max(0, totalActual - otherActualSum);
-
-            const plannedMin = otherPlannedSum + currentBountyActual;
-            const plannedMax = plannedMin + potential;
-
-            document.getElementById('planned-total-range').innerText = `${plannedMin.toLocaleString()} - ${plannedMax.toLocaleString()}`;
-
-            let nextTier = TIERS.find(t => t.value > totalActual);
-            const nextDiffEl = document.getElementById('next-tier-diff');
-            if (!nextTier) {
-                nextDiffEl.innerText = 'MAX';
-                // Using the top tier's name if reached Platinum was specific
-                document.getElementById('next-tier-name').innerText = t('reachedPlatinum');
-                nextDiffEl.className = 'text-3xl font-bold accent-green';
-            } else {
-                const diff = nextTier.value - totalActual;
-                nextDiffEl.innerText = diff.toLocaleString();
-                document.getElementById('next-tier-name').innerText = t('toTier')(nextTier.name);
-                nextDiffEl.className = 'text-3xl font-bold accent-purple';
-            }
-
-            let plannedTierMax = [...TIERS].reverse().find(tier => tier.value <= plannedMax);
-            document.getElementById('planned-status').innerText = plannedTierMax ? t('maxTierForecast')(plannedTierMax.name) : t('noTierForecast');
-
-            const maxTierValue = TIERS.length > 0 ? TIERS[TIERS.length - 1].value : 25000;
-            const progressPercent = Math.min((totalActual / maxTierValue) * 100, 100);
-            document.getElementById('main-progress-bar').style.width = progressPercent + '%';
-
-            // Motivation Message for Card
-            let earnedTier = [...TIERS].reverse().find(t => totalActual >= t.value);
-            if (earnedTier) {
-                document.getElementById('card-motivation').innerHTML = t('motivationBadge')(earnedTier.name) + ' 🎉';
-            } else {
-                document.getElementById('card-motivation').innerHTML = t('motivationNormal');
-            }
-        }
-
-        // ==================== MIGRATION LOGIC ====================
-        let qrcode = null;
-
-        function showShareModal() {
-            const data = {
-                v: 4,
-                currentSeasonId: CURRENT_SEASON_ID,
-                lang: currentLang,
-                allSeasons: allSeasonsData
-            };
-            const jsonStr = JSON.stringify(data);
-            const compressedData = LZString.compressToEncodedURIComponent(jsonStr);
-            const url = window.location.origin + window.location.pathname + '#data=' + compressedData;
-
-            document.getElementById('share-url').textContent = url;
-            document.getElementById('shareModal').style.display = 'block';
-
-            if (qrcode) {
-                qrcode.clear();
-                qrcode.makeCode(url);
-            } else {
-                qrcode = new QRCode(document.getElementById("qrcode"), {
-                    text: url,
-                    width: 200,
-                    height: 200,
-                    colorDark: "#0f172a",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-            }
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        function copyShareUrl() {
-            const url = document.getElementById('share-url').textContent;
-            navigator.clipboard.writeText(url).then(() => {
-                alert(t('copySuccess'));
-            });
-        }
-
-        function exportDataToFile() {
-            const data = {
-                v: 4,
-                currentSeasonId: CURRENT_SEASON_ID,
-                lang: currentLang,
-                allSeasons: allSeasonsData
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ingress_all_seasons_${new Date().toISOString().slice(0, 10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function importDataFromFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    processImport(data);
-                } catch (err) {
-                    alert(t('invalidData'));
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = ''; // Reset input
-        }
-
-        function checkHashData() {
-            const hash = window.location.hash;
-            if (hash.startsWith('#data=')) {
-                const dataStr = hash.substring(6);
-                try {
-                    let jsonStr = LZString.decompressFromEncodedURIComponent(dataStr);
-
-                    // Fallback for legacy Base64 data
-                    if (!jsonStr) {
-                        try {
-                            jsonStr = decodeURIComponent(escape(atob(dataStr)));
-                        } catch (e) {
-                            jsonStr = null;
-                        }
-                    }
-
-                    if (jsonStr) {
-                        const data = JSON.parse(jsonStr);
-
-                        // Clear hash to avoid repeated prompts on refresh
-                        window.history.replaceState(null, null, window.location.pathname);
-
-                        if (confirm(t('syncConfirm'))) {
-                            processImport(data);
-                        }
-                    }
-                } catch (err) {
-                    console.error('Failed to parse hash data', err);
-                }
-            }
-        }
-
-        function checkMigrationHash() {
-            const hash = window.location.hash;
-            if (hash.startsWith('#migration=')) {
-                const dataStr = hash.substring(11);
-                try {
-                    let jsonStr = LZString.decompressFromEncodedURIComponent(dataStr);
-                    if (jsonStr) {
-                        const data = JSON.parse(jsonStr);
-                        handleMigrationData(data);
-                    }
-                } catch (err) {
-                    console.error('Failed to parse migration data', err);
-                }
-            }
-        }
-
-        function handleMigrationData(data) {
-            let legacyOrionData = null;
-            if (data && data.allSeasons && data.allSeasons['2026_q2_orion']) {
-                legacyOrionData = data.allSeasons['2026_q2_orion'];
-            } else if (data && data.planner && data.seasonId === '2026_q2_orion') {
-                legacyOrionData = data.planner;
-            } else if (data && data.currentSeasonId === '2026_q2_orion' && data.allSeasons) {
-                legacyOrionData = data.allSeasons['2026_q2_orion'];
-            }
-
-            if (!legacyOrionData) {
-                alert(t('migNoDataFound'));
-                window.history.replaceState(null, null, window.location.pathname);
-                return;
-            }
-
-            const existingLocalData = allSeasonsData['2026_q2_orion'];
-            let shouldImport = true;
-
-            if (existingLocalData && (existingLocalData.globalTotal > 0 || Object.keys(existingLocalData.activities).length > 0)) {
-                shouldImport = confirm(t('migOverwriteConfirm'));
-            }
-
-            if (shouldImport) {
-                allSeasonsData['2026_q2_orion'] = legacyOrionData;
-                localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
-                alert(t('migSuccess'));
-            }
-
-            window.history.replaceState(null, null, window.location.pathname);
-            window.location.reload();
-        }
-
-        function manualImportData() {
-            const input = prompt(t('promptManualImport'));
-            if (input && input.startsWith("AGENTSKIT_")) {
-                const dataStr = input.substring(10);
-                try {
-                    let jsonStr = LZString.decompressFromEncodedURIComponent(dataStr);
-                    if (jsonStr) {
-                        const data = JSON.parse(jsonStr);
-                        handleMigrationData(data);
-                    } else {
-                        alert(t('invalidData'));
-                    }
-                } catch (err) {
-                    alert(t('invalidData'));
-                }
-            } else if (input) {
-                alert(t('migInvalidFormatStr'));
-            }
-        }
-
-        // ==================== CARD GENERATION ====================
-        async function generateCard() {
-            const agentName = document.getElementById('agent-name-input').value.trim() || 'UNKNOWN AGENT';
-            const theme = document.getElementById('card-theme-select').value;
-
-            // Populate template
-            const template = document.getElementById('card-template');
-            template.className = theme;
-
-            document.getElementById('ct-title-l1').textContent = t('pageSubtitle');
-            document.getElementById('ct-title-l2').textContent = t('pageTitle');
-            document.getElementById('ct-footer-text').textContent = `GENERATED BY ${t('pageTitle').toUpperCase()}`;
-
-            document.getElementById('ct-agent').textContent = agentName;
-
-            const total = userData.globalTotal || 0;
-            document.getElementById('ct-score').textContent = total.toLocaleString();
-
-            let earnedTier = [...TIERS].reverse().find(t => total >= t.value);
-            const badgeImg = document.getElementById('ct-badge');
-            const congratsMsg = document.getElementById('ct-congrats');
-
-            let imgLoadPromise = Promise.resolve();
-
-            if (earnedTier) {
-                const prefix = SEASON_DB[activeSeasonId].badgePath || 'static/orion/';
-                badgeImg.src = `${prefix}${earnedTier.name.toLowerCase()}.png`;
-                badgeImg.style.display = 'block';
-                congratsMsg.textContent = t('congratsCardMsg')(earnedTier.name);
-                congratsMsg.style.display = 'block';
-
-                imgLoadPromise = new Promise((resolve) => {
-                    badgeImg.onload = resolve;
-                    badgeImg.onerror = resolve; // Continue even if image fails
-                });
-            } else {
-                badgeImg.style.display = 'none';
-                congratsMsg.style.display = 'none';
-            }
-
-            // Calculate specific stats with planned data
-            let stats = {
-                ifs: { a: 0, p: 0 },
-                bounties: { a: 0, p: 0 },
-                events: { a: 0, p: 0 },
-                anomaly: { a: userData.activities['anomaly']?.actual || 0, p: userData.activities['anomaly']?.planned || 0 }
-            };
-
-            ACTIVITIES.forEach(act => {
-                const actual = userData.activities[act.id]?.actual || 0;
-                const planned = userData.activities[act.id]?.planned || 0;
-
-                if (act.id.startsWith('ifs')) {
-                    stats.ifs.a += actual;
-                    stats.ifs.p += planned;
-                } else if (act.isBounty) {
-                    stats.bounties.p = act.max; // Use maximum possible tokens for percentage
-                } else if (act.id !== 'anomaly') {
-                    stats.events.a += actual;
-                    stats.events.p += planned;
-                }
-            });
-
-            let otherActualSum = stats.ifs.a + stats.events.a + stats.anomaly.a;
-            stats.bounties.a = Math.max(0, total - otherActualSum);
-
-            function formatStatHTML(a, p, isBounty = false) {
-                if (p > 0) {
-                    const pct = Math.round((a / p) * 100);
-                    const pctText = isBounty ? t('bountyComplete')(pct) : t('pctComplete')(pct);
-                    return `${a.toLocaleString()}<div class="stat-pct">${pctText}</div>`;
-                }
-                return a.toLocaleString();
-            }
-
-            document.getElementById('ct-bounties').innerHTML = formatStatHTML(stats.bounties.a, stats.bounties.p, true);
-            document.getElementById('ct-ifs').innerHTML = formatStatHTML(stats.ifs.a, stats.ifs.p);
-            document.getElementById('ct-events').innerHTML = formatStatHTML(stats.events.a, stats.events.p);
-            document.getElementById('ct-anomaly').innerHTML = formatStatHTML(stats.anomaly.a, stats.anomaly.p);
-
-            // Render
-            const btn = document.getElementById('btn-generate-card');
-            const originalText = btn.querySelector('span').textContent;
-            btn.querySelector('span').textContent = '...';
-            btn.disabled = true;
-
-            try {
-                // Wait for badge image to fully load
-                await imgLoadPromise;
-                // Small delay to ensure DOM updates are flushed before canvas reads it
-                await new Promise(r => setTimeout(r, 50));
-                const canvas = await html2canvas(template, {
-                    scale: 2, // High resolution
-                    backgroundColor: null,
-                    logging: false,
-                    useCORS: true // Ensure images (badges) load
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                const container = document.getElementById('card-preview-container');
-                container.innerHTML = `<img src="${imgData}" alt="Orion Card">`;
-
-                document.getElementById('cardModal').style.display = 'block';
-            } catch (err) {
-                console.error("Card generation failed", err);
-                alert("Generation failed. Please try again.");
-            } finally {
-                btn.querySelector('span').textContent = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        function processImport(data) {
-            if (data && (data.allSeasons || data.planner)) {
-                let importedSeasons = {};
-
-                // Handle multi-season format (v4+)
-                if (data.allSeasons) {
-                    importedSeasons = data.allSeasons;
-                }
-                // Handle legacy single-season format
-                else if (data.planner) {
-                    const sid = data.seasonId || CURRENT_SEASON_ID;
-                    if (sid !== CURRENT_SEASON_ID) {
-                        if (!confirm(t('wrongSeason')(sid))) return;
-                    }
-                    importedSeasons[sid] = data.planner;
-                }
-
-                // SAFE MERGE: Update only the seasons found in the import payload
-                Object.keys(importedSeasons).forEach(sid => {
-                    allSeasonsData[sid] = importedSeasons[sid];
-                });
-
-                if (data.lang && I18N[data.lang]) {
-                    currentLang = data.lang;
-                    localStorage.setItem('agentskit_lang', currentLang);
-                }
-
-                localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
-                userData = allSeasonsData[activeSeasonId] || { globalTotal: 0, activities: {} };
-
-                // Update UI
-                const inputEl = document.getElementById('global-total-actual');
-                if (inputEl) inputEl.value = userData.globalTotal || 0;
-                applyLanguage();
-                alert(t('migSuccess'));
-            } else {
-                alert(t('invalidData'));
-            }
-        }
-
-        init();
-    </script>
 </body>
 
 </html>

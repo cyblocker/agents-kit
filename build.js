@@ -5,10 +5,11 @@ const { minify } = require('terser');
 
 const OUTPUT_DIR = 'dist';
 
-// Ensure output directory exists
-if (!fs.existsSync(OUTPUT_DIR)) {
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+// Clean and recreate output directory
+if (fs.existsSync(OUTPUT_DIR)) {
+  fs.rmSync(OUTPUT_DIR, { recursive: true, force: true });
 }
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 async function minifyJS(inputFile, outputFile) {
   try {
@@ -20,7 +21,7 @@ async function minifyJS(inputFile, outputFile) {
         pure_funcs: ['console.log']
       },
       mangle: {
-        toplevel: true
+        toplevel: false
       },
       output: {
         comments: false
@@ -47,14 +48,17 @@ async function minifyJS(inputFile, outputFile) {
 async function build() {
   console.log('🔨 Building assets...\n');
 
-  // 1. Minify data.js
+  // 1. Minify core.js
+  await minifyJS('core.js', `${OUTPUT_DIR}/core.min.js`);
+
+  // 2. Minify data.js
   await minifyJS('data.js', `${OUTPUT_DIR}/data.min.js`);
 
-  // 2. Extract and minify core logic (visibility toggle, i18n)
-  await minifyJS('index.html', `${OUTPUT_DIR}/core.min.js`);
+  // 3. Minify app.js
+  await minifyJS('app.js', `${OUTPUT_DIR}/app.min.js`);
 
   // 3. Copy static files
-  const filesToCopy = ['index.html', 'manifest.json', 'favicon.svg', 'sw.js', 'app-icon.png', 'style.css'];
+  const filesToCopy = ['index.html', 'manifest.json', 'favicon.svg', 'sw.js', 'app-icon.png', 'style.css', 'utilities.css', 'robots.txt'];
   
   for (const file of filesToCopy) {
     if (fs.existsSync(file)) {
