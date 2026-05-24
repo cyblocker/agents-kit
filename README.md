@@ -43,6 +43,27 @@ Agents Kit was originally hosted as the "Ingress Season Planner." We provide a r
 2. Serve the directory using any local web server (e.g., `python -m http.server` or VS Code Live Server).
 3. Access the tool at `http://localhost:8000`.
 
+## Optimization Tools
+
+### Badge Image Converter (`scripts/convert_badges.py`)
+To keep the application highly optimized and fast on mobile networks, badge images are served as WebP files in two formats:
+1. **Large WebP (`<badge>.webp` - 512x512)**: Used for high-resolution card rendering.
+2. **Small WebP (`<badge>_small.webp` - 80x80)**: Light-weight icons used for progress bars and selector views.
+
+When adding new seasons with high-resolution PNG badges, place them in a folder under the `static/` directory (e.g., `static/orion/`) and run the converter script:
+
+```bash
+# 1. Install Pillow (Python image library) if you haven't already
+pip install pillow
+
+# 2. Run the script for a specific season folder (e.g. static/orion)
+python scripts/convert_badges.py static/orion
+
+# Alternatively, run without arguments to process the entire static/ folder
+python scripts/convert_badges.py
+```
+This script will convert the PNG files in the target folder into both large and small WebP files.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

@@ -42,6 +42,10 @@
         });
     </script>
 
+    <!-- Critical CSS Preload & Stylesheet -->
+    <link rel="preload" href="utilities.css" as="style">
+    <link rel="stylesheet" href="utilities.css">
+
     <!-- Preconnect & Preload Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,8 +57,6 @@
     <script src="core.min.js" defer></script>
     <script src="data.min.js" defer></script>
     <script src="app.min.js" defer></script>
-
-    <link rel="stylesheet" href="utilities.css">
 </head>
 
 <body class="p-4 md:p-8">
