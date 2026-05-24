@@ -7,21 +7,24 @@ on:
     branches: [ main, master, dev ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Agents Kit (New Site)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout Legacy Site
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: cyblocker/cyblocker.github.io
           path: legacy-site
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24
 
