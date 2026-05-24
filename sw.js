@@ -1,4 +1,4 @@
-const CACHE_NAME = 'agents-kit-v20260525';
+const CACHE_NAME = 'agents-kit-v20260525-2';
 const ASSETS = [
   './',
   './index.html',
