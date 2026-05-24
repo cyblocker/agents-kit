@@ -498,7 +498,8 @@ window.applyLanguage = function () {
     const langMap = { zh: 'zh-CN', en: 'en', ja: 'ja' };
     document.documentElement.lang = langMap[currentLang] || currentLang;
 
-    if (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID] || activeSeasonId !== CURRENT_SEASON_ID) {
+    const isPlaceholder = document.getElementById('placeholder-view').style.display === 'block';
+    if (isPlaceholder) {
         document.getElementById('ph-title').textContent = t('phTitle');
         document.getElementById('ph-desc').textContent = t('phDesc');
     }
@@ -555,7 +556,6 @@ window.applyLanguage = function () {
 
     const elBtnManualCard = document.getElementById('btn-manual-import-card-text'); if (elBtnManualCard) elBtnManualCard.textContent = t('btnManualImportStr');
 
-    const isPlaceholder = document.getElementById('placeholder-view').style.display === 'block';
     if (isPlaceholder) {
         document.title = t('phTitle');
     } else {
