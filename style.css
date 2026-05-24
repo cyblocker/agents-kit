@@ -651,7 +651,3 @@ header {
 .grid-cols-3 > div.ingress-card {
   min-height: 110px;
 }
-
-#table-card {
-  min-height: 480px;
-}
