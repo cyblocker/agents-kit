@@ -1,0 +1,17 @@
+{
+  "v": 4,
+  "currentSeasonId": "2026_q2_orion",
+  "lang": "en",
+  "allSeasons": {
+    "2026_q2_orion": {
+      "globalTotal": 15500,
+      "activities": {
+        "anomaly": {
+          "planned": 1000,
+          "actual": 800,
+          "lastUpdate": "2026-05-13 10:00"
+        }
+      }
+    }
+  }
+}

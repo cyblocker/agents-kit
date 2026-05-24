@@ -9,7 +9,7 @@ const legacyPath = fs.existsSync(path.join(__dirname, 'legacy-site/ingress'))
 
 module.exports = defineConfig({
   testDir: '.',
-  testMatch: 'migration_test.spec.js',
+  testMatch: '*.spec.js',
   timeout: 30000,
   expect: {
     timeout: 5000

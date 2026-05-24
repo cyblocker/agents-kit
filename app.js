@@ -311,6 +311,14 @@ function updateBannerVisibility() {
     const banner = document.getElementById('sync-banner');
     if (!banner) return;
 
+    const isPlaceholderMode = (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID] || new URLSearchParams(window.location.search).get('placeholder') === 'true');
+    const is26q2Active = (activeSeasonId === '2026_q2_orion') && !isPlaceholderMode;
+
+    if (!is26q2Active) {
+        banner.style.display = 'none';
+        return;
+    }
+
     const existingLocalData = allSeasonsData['2026_q2_orion'];
     const hasData = existingLocalData && (existingLocalData.globalTotal > 0 || Object.keys(existingLocalData.activities).length > 0);
 
@@ -339,7 +347,9 @@ function init() {
     updateSyncButtonVisibility();
     updateBannerVisibility();
 
-    if (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID]) {
+    const isPlaceholderMode = (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID] || new URLSearchParams(window.location.search).get('placeholder') === 'true');
+
+    if (isPlaceholderMode) {
         document.getElementById('tracker-view').style.display = 'none';
         document.getElementById('placeholder-view').style.display = 'block';
 
@@ -405,6 +415,8 @@ function initSeason(id) {
     document.getElementById('footer-source').style.display = 'block';
     document.getElementById('footer-formula').style.display = 'block';
 
+    updateBannerVisibility();
+
     const season = SEASON_DB[id];
     TIERS = season.tiers;
     ACTIVITIES = season.activities;
@@ -428,11 +440,8 @@ function initSeason(id) {
 
     const cardModule = document.getElementById('card-module');
     if (cardModule) {
-        if (id === CURRENT_SEASON_ID) {
-            cardModule.style.display = season.cardEnabled ? 'block' : 'none';
-        } else {
-            cardModule.style.display = 'block';
-        }
+        const isPassed = new Date() > new Date(season.endTime);
+        cardModule.style.display = (season.cardEnabled || isPassed) ? 'block' : 'none';
     }
 
     if (!allSeasonsData[id]) {
@@ -489,7 +498,8 @@ window.applyLanguage = function () {
     const langMap = { zh: 'zh-CN', en: 'en', ja: 'ja' };
     document.documentElement.lang = langMap[currentLang] || currentLang;
 
-    if (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID] || activeSeasonId !== CURRENT_SEASON_ID) {
+    const isPlaceholder = document.getElementById('placeholder-view').style.display === 'block';
+    if (isPlaceholder) {
         document.getElementById('ph-title').textContent = t('phTitle');
         document.getElementById('ph-desc').textContent = t('phDesc');
     }
@@ -546,7 +556,6 @@ window.applyLanguage = function () {
 
     const elBtnManualCard = document.getElementById('btn-manual-import-card-text'); if (elBtnManualCard) elBtnManualCard.textContent = t('btnManualImportStr');
 
-    const isPlaceholder = document.getElementById('placeholder-view').style.display === 'block';
     if (isPlaceholder) {
         document.title = t('phTitle');
     } else {

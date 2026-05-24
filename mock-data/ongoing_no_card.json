@@ -1,0 +1,17 @@
+{
+  "v": 4,
+  "currentSeasonId": "2026_q1_chronos",
+  "lang": "en",
+  "allSeasons": {
+    "2026_q1_chronos": {
+      "globalTotal": 8000,
+      "activities": {
+        "bounties": {
+          "planned": 4000,
+          "actual": 4000,
+          "lastUpdate": "2026-03-24 12:00"
+        }
+      }
+    }
+  }
+}
