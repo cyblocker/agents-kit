@@ -380,7 +380,7 @@ function renderPlaceholder() {
             const total = allSeasonsData[season.id].globalTotal || 0;
             const earnedTier = [...season.tiers].reverse().find(t => total >= t.value);
             if (earnedTier) {
-                const imgSrc = season.badgePath + earnedTier.name.toLowerCase() + '.png';
+                const imgSrc = season.badgePath + earnedTier.name.toLowerCase() + '_small.webp';
                 badgeHtml = `<img src="${imgSrc}" class="h-6 w-6 ml-2" alt="${earnedTier.name}">`;
             }
         }
@@ -476,7 +476,7 @@ function renderProgressBarUI(season) {
         div.style.transform = isLast ? 'translateX(-100%)' : 'translateX(-50%)';
         div.style.top = '0';
 
-        const imgSrc = season.badgePath + tier.name.toLowerCase() + '.png';
+        const imgSrc = season.badgePath + tier.name.toLowerCase() + '_small.webp';
         const formatValue = tier.value >= 1000 ? (tier.value / 1000) + 'k' : tier.value;
         const color = tier.color || 'rgba(255,255,255,0.5)';
 
@@ -1009,7 +1009,7 @@ window.generateCard = async function () {
 
     if (earnedTier) {
         const prefix = SEASON_DB[activeSeasonId].badgePath || 'static/orion/';
-        badgeImg.src = `${prefix}${earnedTier.name.toLowerCase()}.png`;
+        badgeImg.src = `${prefix}${earnedTier.name.toLowerCase()}.webp`;
         badgeImg.style.display = 'block';
         congratsMsg.textContent = t('congratsCardMsg')(earnedTier.name);
         congratsMsg.style.display = 'block';
