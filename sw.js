@@ -38,8 +38,9 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event: Stale-While-Revalidate Strategy
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
-  if (event.request.method !== 'GET') return;
+  // Only handle GET requests with HTTP/HTTPS schemes
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET' || !url.protocol.startsWith('http')) return;
 
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) => {

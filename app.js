@@ -64,7 +64,6 @@ window.I18N = {
         unitDay: '天',
         unitHour: '小时',
         unitMinute: '分',
-        max_anomaly: '单项限制见说明',
         btnSyncLegacy: '从旧版网站同步',
         btnManualImportStr: '手动导入旧版网站数据',
         migNoDataFound: '在迁移数据中未找到 2026 Q2 Orion 的数据。',
@@ -138,7 +137,6 @@ window.I18N = {
         unitDay: 'd',
         unitHour: 'h',
         unitMinute: 'm',
-        max_anomaly: 'See desc for limits',
         btnSyncLegacy: 'Sync from Legacy Site',
         btnManualImportStr: 'Manual Import String',
         migNoDataFound: 'No 2026 Q2 Orion data found in the migration payload.',
@@ -212,7 +210,6 @@ window.I18N = {
         unitDay: '日',
         unitHour: '時間',
         unitMinute: '分',
-        max_anomaly: '詳細は説明を参照',
         btnSyncLegacy: '旧サイトから同期',
         btnManualImportStr: '文字列を手動インポート',
         migNoDataFound: '移行データに 2026 Q2 Orion のデータが見つかりませんでした。',
@@ -645,6 +642,7 @@ function renderTable() {
                 </div>
             `;
             hint = `<div class="bounty-hint">${t('bountyHint')(potential)}</div>`;
+        } else {
             plannedInput = `
                 <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
                        aria-label="${t(act.nameKey)} (${t('thPlanned')})"
