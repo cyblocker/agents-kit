@@ -8,7 +8,7 @@ const legacyPath = fs.existsSync(path.join(__dirname, 'legacy-site/ingress'))
   : '../cyblocker.github.io/ingress';
 
 module.exports = defineConfig({
-  testDir: '.',
+  testDir: './tests',
   testMatch: '*.spec.js',
   timeout: 30000,
   expect: {
