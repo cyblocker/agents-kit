@@ -642,12 +642,3 @@ footer {
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
-
-/* Layout Shift (CLS) Prevention Constraints */
-header {
-  min-height: 84px;
-}
-
-.grid-cols-3 > div.ingress-card {
-  min-height: 110px;
-}
