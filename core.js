@@ -21,6 +21,13 @@ const CRITICAL_I18N = {
         pageSubtitle: '読み込み中...',
         inputTotal: 'ゲーム内の現在の総トークンを入力',
         loading: '読み込み中...',
+    },
+    de: {
+        phTitle: 'Ingress Saisonplaner',
+        pageTitle: 'Ingress Saisonplaner',
+        pageSubtitle: 'Wird geladen...',
+        inputTotal: 'Aktuelle In-Game Punktzahl eingeben',
+        loading: 'Wird geladen...',
     }
 };
 
