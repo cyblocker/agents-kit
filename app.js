@@ -344,6 +344,17 @@ function init() {
     updateSyncButtonVisibility();
     updateBannerVisibility();
 
+    const agentInput = document.getElementById('agent-name-input');
+    if (agentInput) {
+        const savedAgentName = localStorage.getItem('agentskit_agent_name');
+        if (savedAgentName) {
+            agentInput.value = savedAgentName;
+        }
+        agentInput.addEventListener('input', (e) => {
+            localStorage.setItem('agentskit_agent_name', e.target.value);
+        });
+    }
+
     const isPlaceholderMode = (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID] || new URLSearchParams(window.location.search).get('placeholder') === 'true');
 
     if (isPlaceholderMode) {
