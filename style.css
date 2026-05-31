@@ -268,6 +268,7 @@ select:focus {
   border: none;
   transition: all 0.2s ease;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .lang-btn:hover {
@@ -352,6 +353,10 @@ td {
   th,
   td {
     padding: 0.75rem 0.5rem !important;
+  }
+
+  .lang-btn {
+    padding: 0.25rem 0.5rem;
   }
 }
 
