@@ -4,7 +4,7 @@ const SEASON_DB = {
     "2026_q2_orion": {
         id: "2026_q2_orion",
         name: "Orion Anomaly Season (2026 Q2)",
-        cardEnabled: false,
+        cardEnabled: true,
         badgePath: "static/orion/",
         endTime: "2026-06-30T23:59:59",
         tiers: [
