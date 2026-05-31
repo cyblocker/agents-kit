@@ -22,7 +22,7 @@ const SEASON_DB = {
             { id: 'op_global', nameKey: 'act_op_global', utcStart: '2026-04-24T18:00:00Z', utcEnd: '2026-05-12T18:00:00Z', max: 7500, unit: 'tokens' },
             { id: 'op_may_early', nameKey: 'act_op_may_early', utcStart: '2026-05-01T18:00:00Z', utcEnd: '2026-06-01T18:00:00Z', max: 3000, unit: 'tokens' },
             { id: 'op_may_late', nameKey: 'act_op_may_late', utcStart: '2026-05-22T18:00:00Z', utcEnd: '2026-06-02T18:00:00Z', max: 3000, unit: 'tokens' },
-            { id: 'op_solstice', nameKey: 'act_op_solstice', max: 3000, unit: 'tokens' },
+            { id: 'op_solstice', nameKey: 'act_op_solstice', utcStart: '2026-06-05T18:00:00Z', utcEnd: '2026-06-22T18:00:00Z', max: 3000, unit: 'tokens' },
             { id: 'anomaly', nameKey: 'act_anomaly', descKey: 'desc_anomaly', max: 30000, unit: 'tokens' }
         ],
         i18n: {
