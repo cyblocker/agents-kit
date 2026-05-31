@@ -91,6 +91,28 @@ const SEASON_DB = {
                 desc_ifs_jun: '6/6 現地イベント',
                 desc_anomaly: '1サイト最大 5000 tokens',
                 max_anomaly: '5000 x サイト数',
+            },
+            de: {
+                pageTitle: 'ORION SAISONPLANER',
+                pageSubtitle: '2026 Q2 (8. Apr. - 30. Juni)',
+                cardTitle: 'INGRESS ORION SAISON',
+                footerSource: 'Quelle: Ingress 2026 Q2 Orion Saison. Alle Daten werden lokal in diesem Browser gespeichert.',
+                act_bounties: 'Tägliche Bounties',
+                act_ifs_apr: 'IFS - April',
+                act_ifs_may: 'IFS - Mai',
+                act_ifs_jun: 'IFS - Juni',
+                act_op_sakura: 'Dispatch: Kirschblütenfest',
+                act_op_global: 'Orion Globale Operation',
+                act_op_may_early: 'Nemesis Redux: Myriad',
+                act_op_may_late: 'Hank Johnson: The Courier Files',
+                act_op_solstice: 'Dispatch: Sommersonnenwende',
+                act_anomaly: 'XM-Anomalie Vor Ort',
+                desc_bounties: '8. Apr. - 30. Juni (84 Tage), bis zu 80 Token/Tag',
+                desc_ifs_apr: '4. Apr. Vor-Ort-Event',
+                desc_ifs_may: '2. Mai Vor-Ort-Event',
+                desc_ifs_jun: '6. Juni Vor-Ort-Event',
+                desc_anomaly: 'Bis zu 5000 Token pro Standort',
+                max_anomaly: '5000 x Anzahl Standorte',
             }
         }
     }

@@ -58,7 +58,7 @@ async function build() {
   await minifyJS('app.js', `${OUTPUT_DIR}/app.min.js`);
 
   // 3. Copy static files
-  const filesToCopy = ['index.html', 'manifest.json', 'favicon.svg', 'sw.js', 'app-icon.png', 'style.css', 'utilities.css', 'robots.txt'];
+  const filesToCopy = ['index.html', 'manifest.json', 'favicon.svg', 'app-icon.png', 'style.css', 'utilities.css', 'robots.txt'];
   
   for (const file of filesToCopy) {
     if (fs.existsSync(file)) {
@@ -84,6 +84,36 @@ async function build() {
     };
     copyDir('static', path.join(OUTPUT_DIR, 'static'));
     console.log(`✓ Copied static directory`);
+  }
+
+  // 5. Generate and replace CACHE_NAME in dist/sw.js using content hash of output files
+  if (fs.existsSync('sw.js')) {
+    const crypto = require('crypto');
+    const hash = crypto.createHash('md5');
+    
+    const filesToHash = [
+      `${OUTPUT_DIR}/index.html`,
+      `${OUTPUT_DIR}/core.min.js`,
+      `${OUTPUT_DIR}/data.min.js`,
+      `${OUTPUT_DIR}/app.min.js`,
+      `${OUTPUT_DIR}/utilities.css`,
+      `${OUTPUT_DIR}/favicon.svg`
+    ];
+
+    filesToHash.forEach(file => {
+      if (fs.existsSync(file)) {
+        hash.update(fs.readFileSync(file));
+      }
+    });
+
+    const fileHash = hash.digest('hex').substring(0, 10);
+    const cacheName = `agents-kit-v${fileHash}`;
+    
+    let swContent = fs.readFileSync('sw.js', 'utf-8');
+    swContent = swContent.replace(/const CACHE_NAME = ['"`][^'"`]+['"`];/, `const CACHE_NAME = '${cacheName}';`);
+    
+    fs.writeFileSync(`${OUTPUT_DIR}/sw.js`, swContent);
+    console.log(`✓ Generated dist/sw.js with CACHE_NAME = '${cacheName}'`);
   }
 
   console.log('\n✅ Build complete! Output in ./dist');
