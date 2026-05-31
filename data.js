@@ -29,6 +29,7 @@ const SEASON_DB = {
             zh: {
                 pageTitle: 'ORION 赛季计划工具',
                 pageSubtitle: '2026 Q2 (4/8 - 6/30)',
+                cardTitle: 'INGRESS ORION 赛季',
                 footerSource: '来源：Ingress 2026 Q2 Orion 赛季说明。所有输入数据均在本地浏览器存储。',
                 act_bounties: '每日任务 (Daily Bounties)',
                 act_ifs_apr: 'IFS - 四月',
@@ -50,6 +51,7 @@ const SEASON_DB = {
             en: {
                 pageTitle: 'ORION SEASON PLANNER',
                 pageSubtitle: '2026 Q2 (Apr 8 - Jun 30)',
+                cardTitle: 'INGRESS ORION SEASON',
                 footerSource: 'Source: Ingress 2026 Q2 Orion Season. All data is stored locally in this browser.',
                 act_bounties: 'Daily Bounties',
                 act_ifs_apr: 'IFS - April',
@@ -71,6 +73,7 @@ const SEASON_DB = {
             ja: {
                 pageTitle: 'ORION シーズンプランナー',
                 pageSubtitle: '2026 Q2 (4/8 - 6/30)',
+                cardTitle: 'INGRESS ORION シーズン',
                 footerSource: '出典：Ingress 2026 Q2 Orion シーズン説明。すべてのデータはブラウザにローカル保存されます。',
                 act_bounties: 'デイリーバウンティ',
                 act_ifs_apr: 'IFS - 4月',
