@@ -428,6 +428,17 @@ function init() {
         });
     }
 
+    const themeSelect = document.getElementById('card-theme-select');
+    if (themeSelect) {
+        const savedCardTheme = localStorage.getItem('agentskit_card_theme');
+        if (savedCardTheme) {
+            themeSelect.value = savedCardTheme;
+        }
+        themeSelect.addEventListener('change', (e) => {
+            localStorage.setItem('agentskit_card_theme', e.target.value);
+        });
+    }
+
     const isPlaceholderMode = (!CURRENT_SEASON_ID || !SEASON_DB[CURRENT_SEASON_ID] || new URLSearchParams(window.location.search).get('placeholder') === 'true');
 
     if (isPlaceholderMode) {
@@ -870,6 +881,8 @@ window.showShareModal = async function () {
         v: 4,
         currentSeasonId: CURRENT_SEASON_ID,
         lang: currentLang,
+        agentName: localStorage.getItem('agentskit_agent_name') || '',
+        cardTheme: localStorage.getItem('agentskit_card_theme') || 'theme-default',
         allSeasons: allSeasonsData
     };
     const jsonStr = JSON.stringify(data);
@@ -910,6 +923,8 @@ window.exportDataToFile = async function () {
         v: 4,
         currentSeasonId: CURRENT_SEASON_ID,
         lang: currentLang,
+        agentName: localStorage.getItem('agentskit_agent_name') || '',
+        cardTheme: localStorage.getItem('agentskit_card_theme') || 'theme-default',
         allSeasons: allSeasonsData
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1190,6 +1205,18 @@ function processImport(data) {
         if (data.lang && I18N[data.lang]) {
             currentLang = data.lang;
             localStorage.setItem('agentskit_lang', currentLang);
+        }
+
+        if (data.agentName !== undefined) {
+            localStorage.setItem('agentskit_agent_name', data.agentName);
+            const agentInput = document.getElementById('agent-name-input');
+            if (agentInput) agentInput.value = data.agentName;
+        }
+
+        if (data.cardTheme !== undefined) {
+            localStorage.setItem('agentskit_card_theme', data.cardTheme);
+            const themeSelect = document.getElementById('card-theme-select');
+            if (themeSelect) themeSelect.value = data.cardTheme;
         }
 
         localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
