@@ -18,7 +18,8 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      const requests = ASSETS.map(url => new Request(url, { cache: 'reload' }));
+      return cache.addAll(requests);
     })
   );
   self.skipWaiting();
