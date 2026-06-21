@@ -81,6 +81,7 @@ test.describe('Ingress Planner Table and LocalStorage Verification', () => {
       localStorage.setItem('ingress_planner_all_seasons', JSON.stringify(data));
     }, mockData);
     await page.goto('http://localhost:8001/?lang=en');
+    await page.locator('#season-selector').selectOption('2026_q2_orion');
 
     // 1. Verify global total is loaded correctly
     const globalTotalInput = page.locator('#global-total-actual');

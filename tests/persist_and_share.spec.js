@@ -198,6 +198,7 @@ test.describe('Ingress Planner Persistence and Share Verification', () => {
       localStorage.setItem('agentskit_card_theme', 'theme-res');
     });
     await page.goto('http://localhost:8001/?lang=en');
+    await page.locator('#season-selector').selectOption('2026_q2_orion');
 
     // 2. Generate a URL from old payload (no agentName or cardTheme)
     // We can compress this JSON: {v: 4, currentSeasonId: '2026_q2_orion', lang: 'en', allSeasons: { '2026_q2_orion': { globalTotal: 100, activities: {} } }}

@@ -472,8 +472,12 @@ function renderPlaceholder() {
             const total = allSeasonsData[season.id].globalTotal || 0;
             const earnedTier = [...season.tiers].reverse().find(t => total >= t.value);
             if (earnedTier) {
-                const imgSrc = season.badgePath + earnedTier.name.toLowerCase() + '_small.webp';
-                badgeHtml = `<img src="${imgSrc}" class="h-6 w-6 ml-2" alt="${earnedTier.name}">`;
+                if (season.badgePath) {
+                    const imgSrc = season.badgePath + earnedTier.name.toLowerCase() + '_small.webp';
+                    badgeHtml = `<img src="${imgSrc}" class="h-6 w-6 ml-2" alt="${earnedTier.name}">`;
+                } else {
+                    badgeHtml = `<div class="h-6 w-6 ml-2 rounded-full inline-flex items-center justify-center font-bold text-[10px] badge-${earnedTier.name.toLowerCase()}">${earnedTier.name.charAt(0)}</div>`;
+                }
             }
         }
 
@@ -568,12 +572,19 @@ function renderProgressBarUI(season) {
         div.style.transform = isLast ? 'translateX(-100%)' : 'translateX(-50%)';
         div.style.top = '0';
 
-        const imgSrc = season.badgePath + tier.name.toLowerCase() + '_small.webp';
         const formatValue = tier.value >= 1000 ? (tier.value / 1000) + 'k' : tier.value;
         const color = tier.color || 'rgba(255,255,255,0.5)';
 
+        let badgeHtml = '';
+        if (season.badgePath) {
+            const imgSrc = season.badgePath + tier.name.toLowerCase() + '_small.webp';
+            badgeHtml = `<img src="${imgSrc}" class="w-10 h-10 mx-auto" style="filter: drop-shadow(0 0 5px ${color})" alt="${tier.name}">`;
+        } else {
+            badgeHtml = `<div class="w-10 h-10 rounded-full mx-auto flex items-center justify-center font-bold text-xs badge-${tier.name.toLowerCase()}" style="filter: drop-shadow(0 0 5px ${color})">${tier.name.charAt(0)}</div>`;
+        }
+
         div.innerHTML = `
-            <img src="${imgSrc}" class="w-10 h-10 mx-auto" style="filter: drop-shadow(0 0 5px ${color})" alt="${tier.name}">
+            ${badgeHtml}
             <span class="text-[10px] whitespace-nowrap mt-1 block">${tier.name} (${formatValue})</span>
         `;
         badgeContainer.appendChild(div);
@@ -669,9 +680,21 @@ function getRemainingBountyPotential() {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    if (tomorrow > SEASON_END) return 0;
-    const diffDays = Math.ceil((SEASON_END - tomorrow) / (1000 * 60 * 60 * 24));
-    return Math.max(0, diffDays) * 80;
+    const bountyAct = ACTIVITIES.find(act => act.isBounty);
+    if (!bountyAct) return 0;
+
+    const dailyMax = bountyAct.dailyMax || 80;
+    const bountyStart = bountyAct.localStart ? new Date(bountyAct.localStart) : null;
+    const bountyEnd = bountyAct.localEnd ? new Date(bountyAct.localEnd) : SEASON_END;
+
+    let calcStart = tomorrow;
+    if (bountyStart && calcStart < bountyStart) {
+        calcStart = bountyStart;
+    }
+
+    if (calcStart > bountyEnd) return 0;
+    const diffDays = Math.ceil((bountyEnd - calcStart) / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays) * dailyMax;
 }
 
 function initContact() {
@@ -879,7 +902,7 @@ window.showShareModal = async function () {
 
     const data = {
         v: 4,
-        currentSeasonId: CURRENT_SEASON_ID,
+        currentSeasonId: activeSeasonId,
         lang: currentLang,
         agentName: localStorage.getItem('agentskit_agent_name') || '',
         cardTheme: localStorage.getItem('agentskit_card_theme') || 'theme-default',
@@ -921,7 +944,7 @@ window.copyShareUrl = function () {
 window.exportDataToFile = async function () {
     const data = {
         v: 4,
-        currentSeasonId: CURRENT_SEASON_ID,
+        currentSeasonId: activeSeasonId,
         lang: currentLang,
         agentName: localStorage.getItem('agentskit_agent_name') || '',
         cardTheme: localStorage.getItem('agentskit_card_theme') || 'theme-default',
@@ -1101,23 +1124,34 @@ window.generateCard = async function () {
 
     let earnedTier = [...TIERS].reverse().find(t => total >= t.value);
     const badgeImg = document.getElementById('ct-badge');
+    const badgeFallback = document.getElementById('ct-badge-fallback');
     const congratsMsg = document.getElementById('ct-congrats');
 
     let imgLoadPromise = Promise.resolve();
 
     if (earnedTier) {
-        const prefix = SEASON_DB[activeSeasonId].badgePath || 'static/orion/';
-        badgeImg.src = `${prefix}${earnedTier.name.toLowerCase()}.webp`;
-        badgeImg.style.display = 'block';
+        const prefix = SEASON_DB[activeSeasonId].badgePath || '';
+        if (prefix) {
+            badgeImg.src = `${prefix}${earnedTier.name.toLowerCase()}.webp`;
+            badgeImg.style.display = 'block';
+            if (badgeFallback) badgeFallback.style.display = 'none';
+            imgLoadPromise = new Promise((resolve) => {
+                badgeImg.onload = resolve;
+                badgeImg.onerror = resolve;
+            });
+        } else {
+            badgeImg.style.display = 'none';
+            if (badgeFallback) {
+                badgeFallback.className = `card-badge-fallback badge-${earnedTier.name.toLowerCase()}`;
+                badgeFallback.textContent = earnedTier.name.charAt(0);
+                badgeFallback.style.display = 'flex';
+            }
+        }
         congratsMsg.textContent = t('congratsCardMsg')(earnedTier.name);
         congratsMsg.style.display = 'block';
-
-        imgLoadPromise = new Promise((resolve) => {
-            badgeImg.onload = resolve;
-            badgeImg.onerror = resolve;
-        });
     } else {
         badgeImg.style.display = 'none';
+        if (badgeFallback) badgeFallback.style.display = 'none';
         congratsMsg.style.display = 'none';
     }
 
@@ -1220,11 +1254,12 @@ function processImport(data) {
         }
 
         localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
-        userData = allSeasonsData[activeSeasonId] || { globalTotal: 0, activities: {} };
+        
+        if (data.currentSeasonId && SEASON_DB[data.currentSeasonId]) {
+            activeSeasonId = data.currentSeasonId;
+        }
 
-        const inputEl = document.getElementById('global-total-actual');
-        if (inputEl) inputEl.value = userData.globalTotal || 0;
-        applyLanguage();
+        initSeason(activeSeasonId);
         alert(t('migSuccess'));
     } else {
         alert(t('invalidData'));
