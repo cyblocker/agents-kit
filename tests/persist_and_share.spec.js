@@ -14,6 +14,7 @@ test.describe('Ingress Planner Persistence and Share Verification', () => {
     await page.goto('http://localhost:8001/?lang=en');
     await page.evaluate(() => localStorage.clear());
     await page.goto('http://localhost:8001/?lang=en');
+    await page.locator('#season-selector').selectOption('2026_q2_orion');
 
     // Fill in agent name and change theme
     const agentInput = page.locator('#agent-name-input');

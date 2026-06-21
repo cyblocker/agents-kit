@@ -119,7 +119,7 @@ const SEASON_DB = {
     "2026_q3_apollo": {
         id: "2026_q3_apollo",
         name: "Apollo Anomaly Season (2026 Q3)",
-        cardEnabled: true,
+        cardEnabled: false,
         badgePath: "",
         endTime: "2026-09-30T23:59:59",
         tiers: [

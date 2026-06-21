@@ -476,7 +476,7 @@ function renderPlaceholder() {
                     const imgSrc = season.badgePath + earnedTier.name.toLowerCase() + '_small.webp';
                     badgeHtml = `<img src="${imgSrc}" class="h-6 w-6 ml-2" alt="${earnedTier.name}">`;
                 } else {
-                    badgeHtml = `<div class="h-6 w-6 ml-2 rounded-full inline-flex items-center justify-center font-bold text-[10px] badge-${earnedTier.name.toLowerCase()}">${earnedTier.name.charAt(0)}</div>`;
+                    badgeHtml = `<div class="h-6 w-6 ml-2 rounded-full fallback-badge font-bold text-[10px] badge-${earnedTier.name.toLowerCase()}">${earnedTier.name.charAt(0)}</div>`;
                 }
             }
         }
@@ -525,7 +525,16 @@ function initSeason(id) {
         Object.values(SEASON_DB).forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            opt.textContent = s.name;
+            
+            let displayName = s.name;
+            const match = s.id.match(/^(\d{4})_(q\d)_(.+)$/i);
+            if (match) {
+                const year = match[1];
+                const quarter = match[2].toUpperCase();
+                const nameCapitalized = match[3].charAt(0).toUpperCase() + match[3].slice(1).toLowerCase();
+                displayName = `${nameCapitalized} (${year}${quarter})`;
+            }
+            opt.textContent = displayName;
             if (s.id === id) opt.selected = true;
             selector.appendChild(opt);
         });
@@ -580,7 +589,7 @@ function renderProgressBarUI(season) {
             const imgSrc = season.badgePath + tier.name.toLowerCase() + '_small.webp';
             badgeHtml = `<img src="${imgSrc}" class="w-10 h-10 mx-auto" style="filter: drop-shadow(0 0 5px ${color})" alt="${tier.name}">`;
         } else {
-            badgeHtml = `<div class="w-10 h-10 rounded-full mx-auto flex items-center justify-center font-bold text-xs badge-${tier.name.toLowerCase()}" style="filter: drop-shadow(0 0 5px ${color})">${tier.name.charAt(0)}</div>`;
+            badgeHtml = `<div class="w-10 h-10 rounded-full mx-auto fallback-badge font-bold text-xs badge-${tier.name.toLowerCase()}" style="filter: drop-shadow(0 0 5px ${color})">${tier.name.charAt(0)}</div>`;
         }
 
         div.innerHTML = `
@@ -1171,9 +1180,9 @@ window.generateCard = async function () {
         } else {
             badgeImg.style.display = 'none';
             if (badgeFallback) {
-                badgeFallback.className = `card-badge-fallback badge-${earnedTier.name.toLowerCase()}`;
+                badgeFallback.className = `card-badge-fallback fallback-badge badge-${earnedTier.name.toLowerCase()}`;
                 badgeFallback.textContent = earnedTier.name.charAt(0);
-                badgeFallback.style.display = 'flex';
+                badgeFallback.style.display = 'inline-flex';
             }
         }
         congratsMsg.textContent = t('congratsCardMsg')(earnedTier.name);
