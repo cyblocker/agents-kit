@@ -14,6 +14,7 @@ test.describe('Ingress Planner Persistence and Share Verification', () => {
     await page.goto('http://localhost:8001/?lang=en');
     await page.evaluate(() => localStorage.clear());
     await page.goto('http://localhost:8001/?lang=en');
+    await page.locator('#season-selector').selectOption('2026_q2_orion');
 
     // Fill in agent name and change theme
     const agentInput = page.locator('#agent-name-input');
@@ -198,6 +199,7 @@ test.describe('Ingress Planner Persistence and Share Verification', () => {
       localStorage.setItem('agentskit_card_theme', 'theme-res');
     });
     await page.goto('http://localhost:8001/?lang=en');
+    await page.locator('#season-selector').selectOption('2026_q2_orion');
 
     // 2. Generate a URL from old payload (no agentName or cardTheme)
     // We can compress this JSON: {v: 4, currentSeasonId: '2026_q2_orion', lang: 'en', allSeasons: { '2026_q2_orion': { globalTotal: 100, activities: {} } }}
@@ -216,6 +218,9 @@ test.describe('Ingress Planner Persistence and Share Verification', () => {
       const data = JSON.parse(jsonStr);
       delete data.agentName;
       delete data.cardTheme;
+      if (!data.allSeasons['2026_q2_orion']) {
+        data.allSeasons['2026_q2_orion'] = { globalTotal: 0, activities: {} };
+      }
       data.allSeasons['2026_q2_orion'].globalTotal = 12345;
       return LZString.compressToEncodedURIComponent(JSON.stringify(data));
     }, compressedData);
