@@ -46,8 +46,9 @@ test.describe('Ingress Data Migration Flow', () => {
         }
     });
 
-    // Step 3: Trigger Manual Export from the Banner
-    const manualBtn = page.locator('#btn-manual-export');
+    // Step 3: Trigger Manual Export from the Banner or Overlay
+    // The legacy site has been ramped down, so we click the button in the migrated overlay.
+    const manualBtn = page.locator('#btn-copy-manual-export-overlay');
     await expect(manualBtn).toBeVisible();
     await manualBtn.click();
     
