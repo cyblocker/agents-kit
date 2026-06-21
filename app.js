@@ -892,6 +892,49 @@ function calculate() {
 // ==================== MIGRATION & SHARING ====================
 let qrcode = null;
 
+function getSharePayload() {
+    const cleanedSeasons = {};
+    Object.keys(allSeasonsData).forEach(sid => {
+        const sData = allSeasonsData[sid];
+        if (!sData) return;
+        const hasTotal = sData.globalTotal > 0;
+        const hasActivities = Object.keys(sData.activities || {}).some(actId => {
+            const act = sData.activities[actId];
+            return act && ((act.planned || 0) > 0 || (act.actual || 0) > 0);
+        });
+        if (hasTotal || hasActivities) {
+            const cleanedAct = {};
+            if (sData.activities) {
+                Object.keys(sData.activities).forEach(actId => {
+                    const act = sData.activities[actId];
+                    if (act && ((act.planned || 0) > 0 || (act.actual || 0) > 0)) {
+                        cleanedAct[actId] = {
+                            planned: act.planned || 0,
+                            actual: act.actual || 0
+                        };
+                        if (act.lastUpdate && act.lastUpdate !== '-') {
+                            cleanedAct[actId].lastUpdate = act.lastUpdate;
+                        }
+                    }
+                });
+            }
+            cleanedSeasons[sid] = {
+                globalTotal: sData.globalTotal || 0,
+                activities: cleanedAct
+            };
+        }
+    });
+
+    return {
+        v: 4,
+        currentSeasonId: activeSeasonId,
+        lang: currentLang,
+        agentName: localStorage.getItem('agentskit_agent_name') || '',
+        cardTheme: localStorage.getItem('agentskit_card_theme') || 'theme-default',
+        allSeasons: cleanedSeasons
+    };
+}
+
 window.showShareModal = async function () {
     if (typeof LZString === 'undefined') {
         await loadScript('https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js');
@@ -900,14 +943,7 @@ window.showShareModal = async function () {
         await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
     }
 
-    const data = {
-        v: 4,
-        currentSeasonId: activeSeasonId,
-        lang: currentLang,
-        agentName: localStorage.getItem('agentskit_agent_name') || '',
-        cardTheme: localStorage.getItem('agentskit_card_theme') || 'theme-default',
-        allSeasons: allSeasonsData
-    };
+    const data = getSharePayload();
     const jsonStr = JSON.stringify(data);
     const compressedData = LZString.compressToEncodedURIComponent(jsonStr);
     const url = window.location.origin + window.location.pathname + '#data=' + compressedData;
@@ -925,7 +961,7 @@ window.showShareModal = async function () {
             height: 200,
             colorDark: "#0f172a",
             colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
+            correctLevel: QRCode.CorrectLevel.M
         });
     }
 };
@@ -942,14 +978,7 @@ window.copyShareUrl = function () {
 };
 
 window.exportDataToFile = async function () {
-    const data = {
-        v: 4,
-        currentSeasonId: activeSeasonId,
-        lang: currentLang,
-        agentName: localStorage.getItem('agentskit_agent_name') || '',
-        cardTheme: localStorage.getItem('agentskit_card_theme') || 'theme-default',
-        allSeasons: allSeasonsData
-    };
+    const data = getSharePayload();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

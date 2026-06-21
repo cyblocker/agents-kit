@@ -217,6 +217,9 @@ test.describe('Ingress Planner Persistence and Share Verification', () => {
       const data = JSON.parse(jsonStr);
       delete data.agentName;
       delete data.cardTheme;
+      if (!data.allSeasons['2026_q2_orion']) {
+        data.allSeasons['2026_q2_orion'] = { globalTotal: 0, activities: {} };
+      }
       data.allSeasons['2026_q2_orion'].globalTotal = 12345;
       return LZString.compressToEncodedURIComponent(JSON.stringify(data));
     }, compressedData);
