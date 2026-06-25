@@ -525,7 +525,7 @@ function initSeason(id) {
         Object.values(SEASON_DB).forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            
+
             let displayName = s.name;
             const match = s.id.match(/^(\d{4})_(q\d)_(.+)$/i);
             if (match) {
@@ -721,6 +721,9 @@ function renderTable() {
     tbody.innerHTML = '';
     const potential = getRemainingBountyPotential();
 
+    const bountyAct = ACTIVITIES.find(a => a.isBounty);
+    const dailyMax = bountyAct ? (bountyAct.dailyMax || 80) : 80;
+
     let otherActualSum = 0;
     ACTIVITIES.forEach(act => {
         if (!act.isBounty) {
@@ -765,7 +768,7 @@ function renderTable() {
             actualInput = `
                 <div class="flex flex-col">
                     <span class="text-green-400 font-mono font-bold text-lg">${calculatedBounty}</span>
-                    <div class="text-[10px] text-slate-500 mt-1">${t('daysCompleted')(Math.floor(calculatedBounty / 80))}</div>
+                    <div class="text-[10px] text-slate-500 mt-1">${t('daysCompleted')(Math.floor(calculatedBounty / dailyMax))}</div>
                 </div>
             `;
             hint = `<div class="bounty-hint">${t('bountyHint')(potential)}</div>`;
@@ -1292,7 +1295,7 @@ function processImport(data) {
         }
 
         localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
-        
+
         if (data.currentSeasonId && SEASON_DB[data.currentSeasonId]) {
             activeSeasonId = data.currentSeasonId;
         }
