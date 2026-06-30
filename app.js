@@ -767,14 +767,14 @@ function renderTable() {
             let statusBadge = '';
             if (now < start) {
                 const diff = start - now;
-                statusBadge = `<div class="mt-1 text-[10px] text-cyan-400 font-semibold uppercase tracking-wider">${t('startsIn')(formatTimeRemaining(diff))}</div>`;
+                statusBadge = `<div class="mt-1 text-xs text-cyan-400 font-semibold uppercase tracking-wider">${t('startsIn')(formatTimeRemaining(diff))}</div>`;
             } else if (now < end) {
                 const diff = end - now;
-                statusBadge = `<div class="mt-1 text-[10px] text-amber-400 font-semibold uppercase tracking-wider animate-pulse">${t('endsIn')(formatTimeRemaining(diff))}</div>`;
+                statusBadge = `<div class="mt-1 text-xs text-amber-400 font-semibold uppercase tracking-wider animate-pulse">${t('endsIn')(formatTimeRemaining(diff))}</div>`;
             } else {
-                statusBadge = `<div class="mt-1 text-[10px] text-rose-500 font-semibold uppercase tracking-wider opacity-70">${t('ended')}</div>`;
+                statusBadge = `<div class="mt-1 text-xs text-rose-500 font-semibold uppercase tracking-wider opacity-70">${t('ended')}</div>`;
             }
-            displayDesc += `<div class="text-[10px] text-slate-500 font-mono mt-0.5">${timeStr}</div>${statusBadge}`;
+            displayDesc += `<div class="text-xs text-slate-500 font-mono mt-0.5">${timeStr}</div>${statusBadge}`;
         }
 
         if (act.isBounty) {
@@ -889,8 +889,8 @@ function renderTable() {
         row.innerHTML = `
             <td class="p-4">
                 <div class="font-semibold text-slate-200 text-sm sm:text-base flex items-center gap-1">${t(act.nameKey)}${tooltipHTML}</div>
-                <div class="show-on-narrow text-[10px] sm:text-xs text-slate-400 font-mono mt-0.5">${t('limitLabel')}: ${displayMax}</div>
-                <div class="text-[10px] sm:text-xs text-slate-500">${displayDesc}</div>
+                <div class="show-on-narrow text-xs text-slate-400 font-mono mt-0.5">${t('limitLabel')}: ${displayMax}</div>
+                <div class="text-xs text-slate-500">${displayDesc}</div>
                 ${hint}
             </td>
             <td class="p-4 text-slate-400 font-mono text-xs sm:text-sm hide-on-narrow">${displayMax}</td>
