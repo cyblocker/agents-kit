@@ -775,16 +775,101 @@ function renderTable() {
                 </div>
             `;
             hint = `<div class="bounty-hint">${t('bountyHint')(potential)}</div>`;
+        } else if (act.type === 'binary') {
+            const plannedChecked = stored.planned === act.max ? 'checked' : '';
+            const actualChecked = stored.actual === act.max ? 'checked' : '';
+            plannedInput = `
+                <div class="flex items-center justify-center h-full">
+                    <label class="custom-checkbox-container">
+                        <input type="checkbox" ${plannedChecked}
+                               aria-label="${t(act.nameKey)} (${t('thPlanned')})"
+                               onchange="updateBinaryValue('${act.id}', 'planned', this.checked, ${act.max})">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+            `;
+            actualInput = `
+                <div class="flex items-center justify-center h-full">
+                    <label class="custom-checkbox-container">
+                        <input type="checkbox" ${actualChecked}
+                               aria-label="${t(act.nameKey)} (${t('thActual')})"
+                               onchange="updateBinaryValue('${act.id}', 'actual', this.checked, ${act.max})">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+            `;
+        } else if (act.type === 'incremental') {
+            plannedInput = `
+                <div class="flex flex-col gap-1 items-stretch">
+                    <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
+                           aria-label="${t(act.nameKey)} (${t('thPlanned')})"
+                           onchange="updateValue('${act.id}', 'planned', this.value)"
+                           id="input-planned-${act.id}">
+                    <div class="flex flex-wrap gap-1.5 justify-start mt-1">
+                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'planned', 3000, ${act.max})">+3k</button>
+                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'planned', 5000, ${act.max})">+5k</button>
+                        <button type="button" class="preset-pill preset-pill-reset" onclick="updateValue('${act.id}', 'planned', 0)">Reset</button>
+                    </div>
+                </div>
+            `;
+            actualInput = `
+                <div class="flex flex-col gap-1 items-stretch">
+                    <input type="number" min="0" max="${act.max}" value="${stored.actual}" 
+                           aria-label="${t(act.nameKey)} (${t('thActual')})"
+                           onchange="updateValue('${act.id}', 'actual', this.value)"
+                           id="input-actual-${act.id}">
+                    <div class="flex flex-wrap gap-1.5 justify-start mt-1">
+                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'actual', 3000, ${act.max})">+3k</button>
+                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'actual', 5000, ${act.max})">+5k</button>
+                        <button type="button" class="preset-pill preset-pill-reset" onclick="updateValue('${act.id}', 'actual', 0)">Reset</button>
+                    </div>
+                </div>
+            `;
+        } else if (act.type === 'presets' || act.presets) {
+            const presets = act.presets || [0, act.max];
+            const plannedPills = presets.map(p => {
+                const label = p === 0 ? '0' : (p >= 1000 ? (p / 1000) + 'k' : p);
+                return `<button type="button" class="preset-pill" onclick="updateValue('${act.id}', 'planned', ${p})">${label}</button>`;
+            }).join('');
+            const actualPills = presets.map(p => {
+                const label = p === 0 ? '0' : (p >= 1000 ? (p / 1000) + 'k' : p);
+                return `<button type="button" class="preset-pill" onclick="updateValue('${act.id}', 'actual', ${p})">${label}</button>`;
+            }).join('');
+
+            plannedInput = `
+                <div class="flex flex-col gap-1 items-stretch">
+                    <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
+                           aria-label="${t(act.nameKey)} (${t('thPlanned')})"
+                           onchange="updateValue('${act.id}', 'planned', this.value)"
+                           id="input-planned-${act.id}">
+                    <div class="flex flex-wrap gap-1.5 justify-start mt-1">
+                        ${plannedPills}
+                    </div>
+                </div>
+            `;
+            actualInput = `
+                <div class="flex flex-col gap-1 items-stretch">
+                    <input type="number" min="0" max="${act.max}" value="${stored.actual}" 
+                           aria-label="${t(act.nameKey)} (${t('thActual')})"
+                           onchange="updateValue('${act.id}', 'actual', this.value)"
+                           id="input-actual-${act.id}">
+                    <div class="flex flex-wrap gap-1.5 justify-start mt-1">
+                        ${actualPills}
+                    </div>
+                </div>
+            `;
         } else {
             plannedInput = `
                 <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
                        aria-label="${t(act.nameKey)} (${t('thPlanned')})"
-                       onchange="updateValue('${act.id}', 'planned', this.value)">
+                       onchange="updateValue('${act.id}', 'planned', this.value)"
+                       id="input-planned-${act.id}">
             `;
             actualInput = `
                 <input type="number" min="0" max="${act.max}" value="${stored.actual}" 
                        aria-label="${t(act.nameKey)} (${t('thActual')})"
-                       onchange="updateValue('${act.id}', 'actual', this.value)">
+                       onchange="updateValue('${act.id}', 'actual', this.value)"
+                       id="input-actual-${act.id}">
             `;
         }
 
@@ -824,6 +909,19 @@ window.updateValue = function (id, type, value) {
     userData.activities[id].lastUpdate = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     saveAndRefresh();
+};
+
+window.updateBinaryValue = function (id, type, checked, max) {
+    window.updateValue(id, type, checked ? max : 0);
+};
+
+window.incrementValue = function (id, type, increment, max) {
+    if (!userData.activities[id]) {
+        userData.activities[id] = { planned: 0, actual: 0, lastUpdate: '-' };
+    }
+    const current = userData.activities[id][type] || 0;
+    const val = Math.min(max, Math.max(0, current + increment));
+    window.updateValue(id, type, val);
 };
 
 function saveAndRefresh() {

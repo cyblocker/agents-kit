@@ -687,3 +687,103 @@ footer {
   line-height: 1 !important;
   letter-spacing: normal !important;
 }
+
+/* Custom Checkbox Toggle Styles */
+.custom-checkbox-container {
+  display: inline-block;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.custom-checkbox-container .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 24px;
+  width: 24px;
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 2px solid #334155;
+  border-radius: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-checkbox-container:hover input ~ .checkmark {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.custom-checkbox-container input:checked ~ .checkmark {
+  background-color: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.custom-checkbox-container .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.custom-checkbox-container .checkmark:after {
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 11px;
+  border: solid white;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+
+/* Preset Pill Styles */
+.preset-pill {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid #475569;
+  color: #94a3b8;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.preset-pill:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+  color: #eff6ff;
+  transform: translateY(-0.5px);
+}
+
+.preset-pill:active {
+  transform: translateY(0.5px);
+}
+
+.preset-pill-reset {
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.3);
+  background: rgba(244, 63, 94, 0.05);
+}
+
+.preset-pill-reset:hover {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: #f43f5e;
+  color: #ffe4e6;
+}
