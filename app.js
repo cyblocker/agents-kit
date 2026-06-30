@@ -742,13 +742,16 @@ function renderTable() {
         let actualInput = '';
         let hint = '';
 
-        let displayDesc = act.descKey ? t(act.descKey) : '';
+        let displayDesc = '';
+        if (act.descKey) {
+            displayDesc += `<div class="text-xs text-slate-400 mb-1">${t(act.descKey)}</div>`;
+        }
         if (act.utcStart && act.utcEnd) {
             const start = new Date(act.utcStart);
             const end = new Date(act.utcEnd);
             const now = new Date();
             const fmt = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
-            displayDesc = `${start.toLocaleString([], fmt)} - ${end.toLocaleString([], fmt)} (${t('localTime')})`;
+            const timeStr = `${start.toLocaleString([], fmt)} - ${end.toLocaleString([], fmt)} (${t('localTime')})`;
 
             let statusBadge = '';
             if (now < start) {
@@ -760,7 +763,7 @@ function renderTable() {
             } else {
                 statusBadge = `<div class="mt-1 text-[10px] text-rose-500 font-semibold uppercase tracking-wider opacity-70">${t('ended')}</div>`;
             }
-            displayDesc += statusBadge;
+            displayDesc += `<div class="text-[10px] text-slate-500 font-mono mt-0.5">${timeStr}</div>${statusBadge}`;
         }
 
         if (act.isBounty) {
