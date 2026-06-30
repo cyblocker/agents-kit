@@ -162,8 +162,8 @@ const SEASON_DB = {
                 desc_op_july_dispatch_2: '详情将于7月初公布',
                 desc_op_august_dispatch: '详情将于8月初公布',
                 desc_op_autumn_equinox: 'Dispatch 行动活动',
-                desc_op_global_apollo: '根据实际完成的任务分配 2,000 赛季分。',
-                desc_anomaly: '每站分配 300 赛季分。',
+                desc_op_global_apollo: '根据实际完成的任务争夺 2,000 赛季分。',
+                desc_anomaly: '每站争夺 300 赛季分。',
                 max_anomaly: '5000 x 场次',
             },
             en: {
@@ -214,8 +214,8 @@ const SEASON_DB = {
                 desc_op_july_dispatch_2: '詳細は7月初旬に公開予定',
                 desc_op_august_dispatch: '詳細は8月初旬に公開予定',
                 desc_op_autumn_equinox: 'Dispatch 作戦イベント',
-                desc_op_global_apollo: 'タスク完了実績に基づき、両陣営に計2,000シーズンポイントを分配。',
-                desc_anomaly: '1サイトあたり両陣営に計300シーズンポイントを分配。',
+                desc_op_global_apollo: 'タスク完了実績に基づき、両陣営に計2,000シーズンポイントを争奪。',
+                desc_anomaly: '1サイトあたり両陣営に計300シーズンポイントを争奪。',
                 max_anomaly: '5000 x サイト数',
             },
             de: {
