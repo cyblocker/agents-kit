@@ -129,15 +129,15 @@ const SEASON_DB = {
         ],
         activities: [
             { id: 'bounties', nameKey: 'act_bounties', descKey: 'desc_bounties', localStart: '2026-07-01T00:00:00', localEnd: '2026-09-18T23:59:59', max: 4800, dailyMax: 60, unit: 'tokens', isBounty: true },
-            { id: 'ifs_jul', nameKey: 'act_ifs_jul', descKey: 'desc_ifs_jul', max: 2500, unit: 'tokens' },
-            { id: 'ifs_aug', nameKey: 'act_ifs_aug', descKey: 'desc_ifs_aug', max: 2500, unit: 'tokens' },
-            { id: 'ifs_sep', nameKey: 'act_ifs_sep', descKey: 'desc_ifs_sep', max: 2500, unit: 'tokens' },
-            { id: 'op_july_dispatch', nameKey: 'act_op_july_dispatch', utcStart: '2026-07-01T18:00:00Z', utcEnd: '2026-07-31T18:00:00Z', max: 2500, unit: 'tokens' },
-            { id: 'op_july_dispatch_2', nameKey: 'act_op_july_dispatch_2', utcStart: '2026-07-15T18:00:00Z', utcEnd: '2026-08-14T18:00:00Z', max: 2500, unit: 'tokens' },
-            { id: 'op_august_dispatch', nameKey: 'act_op_august_dispatch', utcStart: '2026-07-31T18:00:00Z', utcEnd: '2026-08-31T18:00:00Z', max: 2500, unit: 'tokens' },
-            { id: 'op_autumn_equinox', nameKey: 'act_op_autumn_equinox', utcStart: '2026-09-01T18:00:00Z', utcEnd: '2026-09-30T18:00:00Z', max: 2500, unit: 'tokens' },
-            { id: 'op_global_apollo', nameKey: 'act_op_global_apollo', descKey: 'desc_op_global_apollo', utcStart: '2026-08-26T18:00:00Z', utcEnd: '2026-09-16T18:00:00Z', max: 10000, unit: 'tokens' },
-            { id: 'anomaly', nameKey: 'act_anomaly', descKey: 'desc_anomaly', max: 30000, unit: 'tokens' }
+            { id: 'ifs_jul', nameKey: 'act_ifs_jul', descKey: 'desc_ifs_jul', type: 'binary', max: 2500, unit: 'tokens' },
+            { id: 'ifs_aug', nameKey: 'act_ifs_aug', descKey: 'desc_ifs_aug', type: 'binary', max: 2500, unit: 'tokens' },
+            { id: 'ifs_sep', nameKey: 'act_ifs_sep', descKey: 'desc_ifs_sep', type: 'binary', max: 2500, unit: 'tokens' },
+            { id: 'op_july_dispatch', nameKey: 'act_op_july_dispatch', utcStart: '2026-07-01T18:00:00Z', utcEnd: '2026-07-31T18:00:00Z', presets: [0, 1000, 2500], max: 2500, unit: 'tokens' },
+            { id: 'op_july_dispatch_2', nameKey: 'act_op_july_dispatch_2', type: 'presets', utcStart: '2026-07-15T18:00:00Z', utcEnd: '2026-08-14T18:00:00Z', max: 2500, unit: 'tokens' },
+            { id: 'op_august_dispatch', nameKey: 'act_op_august_dispatch', type: 'presets', utcStart: '2026-07-31T18:00:00Z', utcEnd: '2026-08-31T18:00:00Z', max: 2500, unit: 'tokens' },
+            { id: 'op_autumn_equinox', nameKey: 'act_op_autumn_equinox', type: 'presets', utcStart: '2026-09-01T18:00:00Z', utcEnd: '2026-09-30T18:00:00Z', max: 2500, unit: 'tokens' },
+            { id: 'op_global_apollo', nameKey: 'act_op_global_apollo', descKey: 'desc_op_global_apollo', type: 'presets', utcStart: '2026-08-26T18:00:00Z', utcEnd: '2026-09-16T18:00:00Z', max: 10000, unit: 'tokens' },
+            { id: 'anomaly', nameKey: 'act_anomaly', descKey: 'desc_anomaly', type: 'incremental', presets: [3000, 5000], max: 30000, unit: 'tokens' }
         ],
         i18n: {
             zh: {

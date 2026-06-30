@@ -743,8 +743,19 @@ function renderTable() {
         let hint = '';
 
         let displayDesc = '';
+        let tooltipHTML = '';
         if (act.descKey) {
-            displayDesc += `<div class="text-xs text-slate-400 mb-1">${t(act.descKey)}</div>`;
+            if (act.isBounty) {
+                displayDesc += `<div class="text-xs text-slate-400 mb-1">${t(act.descKey)}</div>`;
+            } else {
+                tooltipHTML = `
+                    <span class="info-tooltip-trigger relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors ml-1.5 align-middle" data-tooltip="${t(act.descKey).replace(/"/g, '&quot;')}">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                            <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                        </svg>
+                    </span>
+                `;
+            }
         }
         if (act.utcStart && act.utcEnd) {
             const start = new Date(act.utcStart);
@@ -756,14 +767,14 @@ function renderTable() {
             let statusBadge = '';
             if (now < start) {
                 const diff = start - now;
-                statusBadge = `<div class="mt-1 text-[10px] text-cyan-400 font-semibold uppercase tracking-wider">${t('startsIn')(formatTimeRemaining(diff))}</div>`;
+                statusBadge = `<div class="mt-1 text-xs text-cyan-400 font-semibold uppercase tracking-wider">${t('startsIn')(formatTimeRemaining(diff))}</div>`;
             } else if (now < end) {
                 const diff = end - now;
-                statusBadge = `<div class="mt-1 text-[10px] text-amber-400 font-semibold uppercase tracking-wider animate-pulse">${t('endsIn')(formatTimeRemaining(diff))}</div>`;
+                statusBadge = `<div class="mt-1 text-xs text-amber-400 font-semibold uppercase tracking-wider animate-pulse">${t('endsIn')(formatTimeRemaining(diff))}</div>`;
             } else {
-                statusBadge = `<div class="mt-1 text-[10px] text-rose-500 font-semibold uppercase tracking-wider opacity-70">${t('ended')}</div>`;
+                statusBadge = `<div class="mt-1 text-xs text-rose-500 font-semibold uppercase tracking-wider opacity-70">${t('ended')}</div>`;
             }
-            displayDesc += `<div class="text-[10px] text-slate-500 font-mono mt-0.5">${timeStr}</div>${statusBadge}`;
+            displayDesc += `<div class="text-xs text-slate-500 font-mono mt-0.5">${timeStr}</div>${statusBadge}`;
         }
 
         if (act.isBounty) {
@@ -775,16 +786,101 @@ function renderTable() {
                 </div>
             `;
             hint = `<div class="bounty-hint">${t('bountyHint')(potential)}</div>`;
+        } else if (act.type === 'binary') {
+            const plannedChecked = stored.planned === act.max ? 'checked' : '';
+            const actualChecked = stored.actual === act.max ? 'checked' : '';
+            plannedInput = `
+                <div class="flex items-center justify-center h-full">
+                    <label class="custom-checkbox-container">
+                        <input type="checkbox" ${plannedChecked}
+                               aria-label="${t(act.nameKey)} (${t('thPlanned')})"
+                               onchange="updateBinaryValue('${act.id}', 'planned', this.checked, ${act.max})">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+            `;
+            actualInput = `
+                <div class="flex items-center justify-center h-full">
+                    <label class="custom-checkbox-container">
+                        <input type="checkbox" ${actualChecked}
+                               aria-label="${t(act.nameKey)} (${t('thActual')})"
+                               onchange="updateBinaryValue('${act.id}', 'actual', this.checked, ${act.max})">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+            `;
+        } else if (act.type === 'incremental') {
+            plannedInput = `
+                <div class="flex flex-col gap-1 items-stretch">
+                    <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
+                           aria-label="${t(act.nameKey)} (${t('thPlanned')})"
+                           onchange="updateValue('${act.id}', 'planned', this.value)"
+                           id="input-planned-${act.id}">
+                    <div class="flex flex-wrap gap-1.5 justify-start mt-1">
+                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'planned', 3000, ${act.max})">+3k</button>
+                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'planned', 5000, ${act.max})">+5k</button>
+                        <button type="button" class="preset-pill preset-pill-reset" onclick="updateValue('${act.id}', 'planned', 0)">Reset</button>
+                    </div>
+                </div>
+            `;
+            actualInput = `
+                <div class="flex flex-col gap-1 items-stretch">
+                    <input type="number" min="0" max="${act.max}" value="${stored.actual}" 
+                           aria-label="${t(act.nameKey)} (${t('thActual')})"
+                           onchange="updateValue('${act.id}', 'actual', this.value)"
+                           id="input-actual-${act.id}">
+                    <div class="flex flex-wrap gap-1.5 justify-start mt-1">
+                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'actual', 3000, ${act.max})">+3k</button>
+                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'actual', 5000, ${act.max})">+5k</button>
+                        <button type="button" class="preset-pill preset-pill-reset" onclick="updateValue('${act.id}', 'actual', 0)">Reset</button>
+                    </div>
+                </div>
+            `;
+        } else if (act.type === 'presets' || act.presets) {
+            const presets = act.presets || [0, act.max];
+            const plannedPills = presets.map(p => {
+                const label = p === 0 ? '0' : (p >= 1000 ? (p / 1000) + 'k' : p);
+                return `<button type="button" class="preset-pill" onclick="updateValue('${act.id}', 'planned', ${p})">${label}</button>`;
+            }).join('');
+            const actualPills = presets.map(p => {
+                const label = p === 0 ? '0' : (p >= 1000 ? (p / 1000) + 'k' : p);
+                return `<button type="button" class="preset-pill" onclick="updateValue('${act.id}', 'actual', ${p})">${label}</button>`;
+            }).join('');
+
+            plannedInput = `
+                <div class="flex flex-col gap-1 items-stretch">
+                    <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
+                           aria-label="${t(act.nameKey)} (${t('thPlanned')})"
+                           onchange="updateValue('${act.id}', 'planned', this.value)"
+                           id="input-planned-${act.id}">
+                    <div class="flex flex-wrap gap-1.5 justify-start mt-1">
+                        ${plannedPills}
+                    </div>
+                </div>
+            `;
+            actualInput = `
+                <div class="flex flex-col gap-1 items-stretch">
+                    <input type="number" min="0" max="${act.max}" value="${stored.actual}" 
+                           aria-label="${t(act.nameKey)} (${t('thActual')})"
+                           onchange="updateValue('${act.id}', 'actual', this.value)"
+                           id="input-actual-${act.id}">
+                    <div class="flex flex-wrap gap-1.5 justify-start mt-1">
+                        ${actualPills}
+                    </div>
+                </div>
+            `;
         } else {
             plannedInput = `
                 <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
                        aria-label="${t(act.nameKey)} (${t('thPlanned')})"
-                       onchange="updateValue('${act.id}', 'planned', this.value)">
+                       onchange="updateValue('${act.id}', 'planned', this.value)"
+                       id="input-planned-${act.id}">
             `;
             actualInput = `
                 <input type="number" min="0" max="${act.max}" value="${stored.actual}" 
                        aria-label="${t(act.nameKey)} (${t('thActual')})"
-                       onchange="updateValue('${act.id}', 'actual', this.value)">
+                       onchange="updateValue('${act.id}', 'actual', this.value)"
+                       id="input-actual-${act.id}">
             `;
         }
 
@@ -792,9 +888,9 @@ function renderTable() {
 
         row.innerHTML = `
             <td class="p-4">
-                <div class="font-semibold text-slate-200 text-sm sm:text-base">${t(act.nameKey)}</div>
-                <div class="show-on-narrow text-[10px] sm:text-xs text-slate-400 font-mono mt-0.5">${t('limitLabel')}: ${displayMax}</div>
-                <div class="text-[10px] sm:text-xs text-slate-500">${displayDesc}</div>
+                <div class="font-semibold text-slate-200 text-sm sm:text-base flex items-center gap-1">${t(act.nameKey)}${tooltipHTML}</div>
+                <div class="show-on-narrow text-xs text-slate-400 font-mono mt-0.5">${t('limitLabel')}: ${displayMax}</div>
+                <div class="text-xs text-slate-500">${displayDesc}</div>
                 ${hint}
             </td>
             <td class="p-4 text-slate-400 font-mono text-xs sm:text-sm hide-on-narrow">${displayMax}</td>
@@ -824,6 +920,19 @@ window.updateValue = function (id, type, value) {
     userData.activities[id].lastUpdate = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     saveAndRefresh();
+};
+
+window.updateBinaryValue = function (id, type, checked, max) {
+    window.updateValue(id, type, checked ? max : 0);
+};
+
+window.incrementValue = function (id, type, increment, max) {
+    if (!userData.activities[id]) {
+        userData.activities[id] = { planned: 0, actual: 0, lastUpdate: '-' };
+    }
+    const current = userData.activities[id][type] || 0;
+    const val = Math.min(max, Math.max(0, current + increment));
+    window.updateValue(id, type, val);
 };
 
 function saveAndRefresh() {
