@@ -70,9 +70,6 @@
             <div class="text-[11px] md:text-[12px] text-slate-300/80 font-mono tracking-[0.2em] md:tracking-[0.4em] uppercase select-none whitespace-nowrap">/ AgentsKit /
             </div>
             <div class="flex items-center gap-2">
-                <select id="season-selector"
-                    class="bg-transparent text-slate-600 text-[10px] border border-slate-800 rounded px-1 py-0.5"
-                    style="display:none;" onchange="switchSeason(this.value)"></select>
                 <div class="lang-toggle" id="lang-toggle">
                     <button class="lang-btn active" data-lang="zh">中文</button>
                     <button class="lang-btn" data-lang="en">EN</button>
@@ -335,6 +332,11 @@
         </main>
 
         <footer class="text-center text-slate-500 text-sm mb-12">
+            <div class="mb-6 flex justify-center">
+                <select id="season-selector"
+                    class="bg-slate-800/80 text-slate-300 text-xs border border-slate-700 rounded-lg px-3 py-1.5 focus:border-blue-500 cursor-pointer"
+                    style="display:none;" onchange="switchSeason(this.value)"></select>
+            </div>
             <p id="footer-source"></p>
             <p id="footer-formula" class="mt-2 opacity-50"></p>
             <div class="mt-6 pt-6 border-t border-slate-800/40 max-w-xs mx-auto">
