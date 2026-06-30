@@ -45,8 +45,8 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request).then((cachedResponse) => {
-        const fetchedResponse = fetch(event.request).then((networkResponse) => {
+      return cache.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
+        const fetchedResponse = fetch(event.request, { cache: 'no-cache' }).then((networkResponse) => {
           // Update cache with new version if it's a valid response
           if (networkResponse.status === 200) {
             cache.put(event.request, networkResponse.clone());
