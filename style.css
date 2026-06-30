@@ -787,3 +787,49 @@ footer {
   border-color: #f43f5e;
   color: #ffe4e6;
 }
+
+/* Info Tooltip Trigger & Popover Styles */
+.info-tooltip-trigger::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 135%;
+  left: -10px;
+  transform: translateY(4px);
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: normal;
+  width: 220px;
+  white-space: normal;
+  text-align: left;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
+  line-height: 1.4;
+}
+
+.info-tooltip-trigger::before {
+  content: "";
+  position: absolute;
+  bottom: 120%;
+  left: 4px;
+  transform: translateY(4px);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #334155 transparent transparent transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 50;
+}
+
+.info-tooltip-trigger:hover::after,
+.info-tooltip-trigger:hover::before {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -743,8 +743,19 @@ function renderTable() {
         let hint = '';
 
         let displayDesc = '';
+        let tooltipHTML = '';
         if (act.descKey) {
-            displayDesc += `<div class="text-xs text-slate-400 mb-1">${t(act.descKey)}</div>`;
+            if (act.isBounty) {
+                displayDesc += `<div class="text-xs text-slate-400 mb-1">${t(act.descKey)}</div>`;
+            } else {
+                tooltipHTML = `
+                    <span class="info-tooltip-trigger relative inline-block cursor-help text-slate-500 hover:text-slate-300 transition-colors ml-1.5 align-middle" data-tooltip="${t(act.descKey).replace(/"/g, '&quot;')}">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                            <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                        </svg>
+                    </span>
+                `;
+            }
         }
         if (act.utcStart && act.utcEnd) {
             const start = new Date(act.utcStart);
@@ -877,7 +888,7 @@ function renderTable() {
 
         row.innerHTML = `
             <td class="p-4">
-                <div class="font-semibold text-slate-200 text-sm sm:text-base">${t(act.nameKey)}</div>
+                <div class="font-semibold text-slate-200 text-sm sm:text-base flex items-center gap-1">${t(act.nameKey)}${tooltipHTML}</div>
                 <div class="show-on-narrow text-[10px] sm:text-xs text-slate-400 font-mono mt-0.5">${t('limitLabel')}: ${displayMax}</div>
                 <div class="text-[10px] sm:text-xs text-slate-500">${displayDesc}</div>
                 ${hint}
