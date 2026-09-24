@@ -59,10 +59,10 @@ test.describe('Ingress Planner Table and LocalStorage Verification', () => {
     await expect(bountyRow.locator('span.text-green-400')).toHaveText('0');
 
     // Verify other activities have 0 inputs
-    const anomalyRow = page.locator('tr:has-text("Anomaly On-site")');
-    await expect(anomalyRow).toBeVisible();
-    await expect(anomalyRow.locator('input[aria-label*="Planned"]')).toHaveValue('0');
-    await expect(anomalyRow.locator('input[aria-label*="Actual"]')).toHaveValue('0');
+    const activityRow = page.locator('tr:has-text("Cygnus Global Battles")');
+    await expect(activityRow).toBeVisible();
+    await expect(activityRow.locator('input[aria-label*="Planned"]')).toHaveValue('0');
+    await expect(activityRow.locator('input[aria-label*="Actual"]')).toHaveValue('0');
   });
 
   test('should correctly render values loaded from local storage', async ({ page }) => {
