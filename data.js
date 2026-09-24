@@ -262,7 +262,7 @@ const SEASON_DB = {
             { id: 'op_dia_de_muertos', nameKey: 'act_op_dia_de_muertos', descKey: 'desc_op_dia_de_muertos', type: 'presets', utcStart: '2026-10-12T18:00:00Z', utcEnd: '2026-11-11T18:00:00Z', max: 2000, unit: 'tokens' },
             { id: 'op_global_deploy', nameKey: 'act_op_global_deploy', descKey: 'desc_op_global_deploy', type: 'presets', utcStart: '2026-11-25T18:00:00Z', utcEnd: '2026-12-16T18:00:00Z', max: 8000, unit: 'tokens' },
             { id: 'op_crystal_horizon', nameKey: 'act_op_crystal_horizon', descKey: 'desc_op_crystal_horizon', type: 'presets', utcStart: '2026-12-02T18:00:00Z', utcEnd: '2026-12-21T18:00:00Z', max: 2000, unit: 'tokens' },
-            { id: 'shard_storm', nameKey: 'act_shard_storm', descKey: 'desc_shard_storm', type: 'presets', presets: [0, 2500, 5000, 7500], max: 7500, unit: 'tokens' }
+            { id: 'shard_storm', nameKey: 'act_shard_storm', descKey: 'desc_shard_storm', type: 'incremental', presets: [2500], max: 7500, unit: 'tokens' }
         ],
         i18n: {
             zh: {

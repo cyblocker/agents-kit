@@ -62,7 +62,8 @@ Read the official announcement (e.g. from `https://ingress.com/news/...` via `re
      - `type: 'presets'`, `max: <token_limit>`.
    - **Shard Storm / XM Anomaly**:
      - Check whether the season features traditional on-site Anomalies, Shard Storms, or both.
-     - `type: 'presets'` or `type: 'incremental'`, set max and presets accordingly.
+     - **Shard Storm**: Use `type: 'incremental'`, `presets: [2500]`, and `max: 7500` (which automatically generates `+2.5k` and `Reset` buttons).
+     - **XM Anomaly**: Use `type: 'incremental'`, `presets: [3000, 5000]`, and `max: 30000` (which automatically generates `+3k`, `+5k`, and `Reset` buttons).
 5. **Localization (`i18n`)**:
    - Provide translations across all four supported languages:
      - `zh` (Simplified Chinese)

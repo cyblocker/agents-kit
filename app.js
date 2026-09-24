@@ -810,6 +810,17 @@ function renderTable() {
                 </div>
             `;
         } else if (act.type === 'incremental') {
+            const incs = act.increments || act.presets || [3000, 5000];
+            const plannedPills = incs.map(inc => {
+                const label = (inc >= 1000) ? `+${inc / 1000}k` : `+${inc}`;
+                return `<button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'planned', ${inc}, ${act.max})">${label}</button>`;
+            }).join('') + `<button type="button" class="preset-pill preset-pill-reset" onclick="updateValue('${act.id}', 'planned', 0)">Reset</button>`;
+
+            const actualPills = incs.map(inc => {
+                const label = (inc >= 1000) ? `+${inc / 1000}k` : `+${inc}`;
+                return `<button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'actual', ${inc}, ${act.max})">${label}</button>`;
+            }).join('') + `<button type="button" class="preset-pill preset-pill-reset" onclick="updateValue('${act.id}', 'actual', 0)">Reset</button>`;
+
             plannedInput = `
                 <div class="flex flex-col gap-1 items-stretch">
                     <input type="number" min="0" max="${act.max}" value="${stored.planned}" 
@@ -817,9 +828,7 @@ function renderTable() {
                            onchange="updateValue('${act.id}', 'planned', this.value)"
                            id="input-planned-${act.id}">
                     <div class="flex flex-wrap gap-1.5 justify-start mt-1">
-                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'planned', 3000, ${act.max})">+3k</button>
-                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'planned', 5000, ${act.max})">+5k</button>
-                        <button type="button" class="preset-pill preset-pill-reset" onclick="updateValue('${act.id}', 'planned', 0)">Reset</button>
+                        ${plannedPills}
                     </div>
                 </div>
             `;
@@ -830,9 +839,7 @@ function renderTable() {
                            onchange="updateValue('${act.id}', 'actual', this.value)"
                            id="input-actual-${act.id}">
                     <div class="flex flex-wrap gap-1.5 justify-start mt-1">
-                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'actual', 3000, ${act.max})">+3k</button>
-                        <button type="button" class="preset-pill" onclick="incrementValue('${act.id}', 'actual', 5000, ${act.max})">+5k</button>
-                        <button type="button" class="preset-pill preset-pill-reset" onclick="updateValue('${act.id}', 'actual', 0)">Reset</button>
+                        ${actualPills}
                     </div>
                 </div>
             `;
