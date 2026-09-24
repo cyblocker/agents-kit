@@ -107,4 +107,33 @@ test.describe('Ingress Planner Table and LocalStorage Verification', () => {
     await expect(bountyRow.locator('span.text-green-400')).toHaveText('4500');
     await expect(bountyRow.locator('text=~56 days completed')).toBeVisible();
   });
+
+  test('should independently maintain global-total-actual across different seasons', async ({ page }) => {
+    await page.goto('http://localhost:8001/?lang=en');
+    await page.evaluate(() => localStorage.clear());
+    await page.goto('http://localhost:8001/?lang=en');
+
+    const globalTotalInput = page.locator('#global-total-actual');
+    const selector = page.locator('#season-selector');
+
+    // 1. On default season (Cygnus), set globalTotal to 5000
+    await globalTotalInput.fill('5000');
+    await globalTotalInput.evaluate(el => el.dispatchEvent(new Event('input')));
+
+    // 2. Switch to Apollo season
+    await selector.selectOption('2026_q3_apollo');
+    await expect(globalTotalInput).toHaveValue('0');
+
+    // 3. Set Apollo globalTotal to 3000
+    await globalTotalInput.fill('3000');
+    await globalTotalInput.evaluate(el => el.dispatchEvent(new Event('input')));
+
+    // 4. Switch back to Cygnus season
+    await selector.selectOption('2026_q4_cygnus');
+    await expect(globalTotalInput).toHaveValue('5000');
+
+    // 5. Switch to Apollo again and verify it still has 3000
+    await selector.selectOption('2026_q3_apollo');
+    await expect(globalTotalInput).toHaveValue('3000');
+  });
 });

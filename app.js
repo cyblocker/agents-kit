@@ -350,9 +350,15 @@ function loadAllSeasonsData() {
         const seasonKey = 'ingress_planner_data_' + CURRENT_SEASON_ID;
         const legacyKey = 'ingress_orion_planner_v3';
 
-        const migratedData = localStorage.getItem(seasonKey) || localStorage.getItem(legacyKey);
-        if (migratedData) {
-            allSeasonsData[CURRENT_SEASON_ID] = JSON.parse(migratedData);
+        const seasonData = localStorage.getItem(seasonKey);
+        const legacyData = localStorage.getItem(legacyKey);
+        if (seasonData) {
+            allSeasonsData[CURRENT_SEASON_ID] = JSON.parse(seasonData);
+        }
+        if (legacyData) {
+            allSeasonsData['2026_q2_orion'] = JSON.parse(legacyData);
+        }
+        if (seasonData || legacyData) {
             localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
         }
     }
@@ -498,6 +504,7 @@ window.switchSeason = function (id) {
 };
 
 function initSeason(id) {
+    activeSeasonId = id;
     document.getElementById('placeholder-view').style.display = 'none';
     document.getElementById('tracker-view').style.display = 'block';
 
@@ -943,7 +950,7 @@ window.incrementValue = function (id, type, increment, max) {
 };
 
 function saveAndRefresh() {
-    allSeasonsData[CURRENT_SEASON_ID] = userData;
+    allSeasonsData[activeSeasonId] = userData;
     localStorage.setItem(GLOBAL_STORAGE_KEY, JSON.stringify(allSeasonsData));
     renderTable();
     calculate();
