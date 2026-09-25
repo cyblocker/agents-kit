@@ -105,7 +105,7 @@ test.describe('Ingress Planner Table and LocalStorage Verification', () => {
     // daysCompleted = Math.floor(4500 / 80) = 56.
     const bountyRow = page.locator('tr:has-text("Daily Bounties")');
     await expect(bountyRow.locator('span.text-green-400')).toHaveText('4500');
-    await expect(bountyRow.locator('text=~56 days completed')).toBeVisible();
+    await expect(bountyRow.locator('text=~56 days equivalent')).toBeVisible();
   });
 
   test('should independently maintain global-total-actual across different seasons', async ({ page }) => {
