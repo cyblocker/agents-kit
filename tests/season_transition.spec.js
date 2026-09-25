@@ -104,6 +104,50 @@ const SEASON_DB = {
         motivationNormal: 'Ended.',
       }
     }
+  },
+  "mock_partial_season": {
+    id: "mock_partial_season",
+    name: "Mock Partial Season (2026 Q2)",
+    cardEnabled: false,
+    badgePath: "static/orion/",
+    endTime: "2026-06-30T23:59:59",
+    tiers: [
+      { name: 'Bronze', value: 5000, color: 'rgba(205,127,50,0.5)' }
+    ],
+    activities: [
+      { id: 'bounties', nameKey: 'act_bounties', descKey: 'desc_bounties', max: 6720, unit: 'tokens', isBounty: true },
+      { id: 'op_early', nameKey: 'act_anomaly', descKey: 'desc_anomaly', utcStart: '2026-04-10T18:00:00Z', max: 3000, unit: 'tokens' },
+      { id: 'anomaly_tbd', nameKey: 'act_anomaly', descKey: 'desc_anomaly', max: 30000, unit: 'tokens' }
+    ],
+    i18n: {
+      en: {
+        pageTitle: 'MOCK PARTIAL PLANNER',
+        pageSubtitle: '2026 Q2 (Apr 1 - Jun 30)',
+        footerSource: 'Partial season.',
+        act_bounties: 'Daily Bounties',
+        act_anomaly: 'Anomaly On-site',
+        desc_bounties: 'Bounties',
+        desc_anomaly: 'Details TBD',
+        limitLabel: 'Limit',
+        textCardModule: 'Commemorative Card',
+        agentPlaceholder: 'Agent Name',
+        optThemeDefault: 'Default (Dark)',
+        optThemeRes: 'Resistance (Blue)',
+        optThemeEnl: 'Enlightened (Green)',
+        btnGenerateCard: 'Generate Card',
+        modalCardTitle: 'Save Commemorative Card',
+        modalCardDesc: 'Card generated!',
+        statBounties: 'Bounties',
+        statIFS: 'IFS',
+        statEvents: 'Events',
+        statAnomaly: 'Anomaly',
+        pctComplete: (p) => \`\${p}% of Target\`,
+        bountyComplete: (p) => \`\${p}% Complete\`,
+        congratsCardMsg: (t) => \`\${t} Badge Earned!\`,
+        motivationBadge: (t) => \`Congratulations!\`,
+        motivationNormal: 'Ongoing.',
+      }
+    }
   }
 };
 if (typeof window !== 'undefined') {
@@ -306,6 +350,18 @@ test.describe('Ingress Season Transition & Visibility', () => {
     const cardModule = page.locator('#card-module');
     // Score is 0, but last event has started -> card module is visible!
     await expect(cardModule).toBeVisible();
+  });
+
+  test('should not prematurely reveal card module if the only dated event is early in the season (>35 days before season end)', async ({ page }) => {
+    // Current date is 2026-04-15 (after op_early on 2026-04-10, but 76 days before June 30 end)
+    await mockBrowserDate(page, '2026-04-15T12:00:00Z');
+    await page.goto('http://localhost:8001/?lang=en&season=mock_partial_season');
+    await page.evaluate(() => localStorage.clear());
+    await page.goto('http://localhost:8001/?lang=en&season=mock_partial_season');
+
+    const cardModule = page.locator('#card-module');
+    // op_early has started, but it is not the last event (>35 days before end) -> card module MUST remain hidden!
+    await expect(cardModule).toBeHidden();
   });
 });
 

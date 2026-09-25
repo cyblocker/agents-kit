@@ -521,6 +521,23 @@ function getLastEventStartDate(season) {
         }
     });
 
+    if (!latest) return null;
+
+    // Safety check: Ingress seasons are quarterly (~90 days). The true final event of a season
+    // always starts in the final month (within ~35 days of season.endTime).
+    // If the latest known event date is earlier than that, it means Niantic has only announced
+    // early/mid-season dates and the end-of-season schedule is still TBD.
+    // In that case, do not prematurely unlock the card module.
+    if (season.endTime) {
+        const seasonEnd = new Date(season.endTime);
+        if (!isNaN(seasonEnd.getTime())) {
+            const daysBeforeEnd = (seasonEnd.getTime() - latest.getTime()) / (1000 * 60 * 60 * 24);
+            if (daysBeforeEnd > 35) {
+                return null;
+            }
+        }
+    }
+
     return latest;
 }
 

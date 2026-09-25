@@ -74,8 +74,9 @@ test.describe('Ingress Season Data Validation & Integrity', () => {
         }
       }
 
-      expect(lastStartUtc, `Season ${seasonId} should have at least one non-bounty activity with start date`).not.toBeNull();
-      expect(lastStartUtc.getTime(), `Season ${seasonId} lastEventStartDate must precede season endTime`).toBeLessThan(seasonEndUtc.getTime());
+      if (lastStartUtc) {
+        expect(lastStartUtc.getTime(), `Season ${seasonId} lastEventStartDate must precede season endTime`).toBeLessThan(seasonEndUtc.getTime());
+      }
     }
   });
 

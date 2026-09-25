@@ -107,7 +107,7 @@ Adapt your actions according to whether badge assets are available:
    The commemorative card generation module (`#card-module`) dynamically reveals itself when **any** of the following conditions are met:
    - `season.cardEnabled === true`: Manual override flag in `data.js`.
    - **Highest Medal Tier Achieved**: User's `totalActual` meets or exceeds the top tier requirement (`totalActual >= season.tiers[season.tiers.length - 1].value`).
-   - **Last Event Starts**: The current date/time is at or past the start of the final non-bounty event of the season (`new Date() >= lastEventStartDate`).
+   - **Last Event Starts**: The current date/time is at or past the start of the final non-bounty event of the season (`new Date() >= lastEventStartDate`). Note: to protect against partial/tentative announcements where only early events have dates, `lastEventStartDate` requires the event to start within the final ~35 days of the season (`season.endTime - eventStart <= 35 days`).
    - **Season Concluded**: Current date has passed `season.endTime`.
 
 ---
