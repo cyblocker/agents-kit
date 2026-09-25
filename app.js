@@ -503,6 +503,62 @@ window.switchSeason = function (id) {
     }
 };
 
+function getLastEventStartDate(season) {
+    if (!season || !season.activities) return null;
+    let latest = null;
+
+    season.activities.forEach(act => {
+        if (act.isBounty) return;
+
+        const dateStr = act.utcStart || act.localStart || act.date;
+        if (dateStr) {
+            const d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+                if (!latest || d > latest) {
+                    latest = d;
+                }
+            }
+        }
+    });
+
+    return latest;
+}
+
+function updateCardModuleVisibility(season, totalActual) {
+    const cardModule = document.getElementById('card-module');
+    if (!cardModule || !season) return;
+
+    // 1. Manual override enabled in data.js
+    if (season.cardEnabled) {
+        cardModule.style.display = 'block';
+        return;
+    }
+
+    // 2. Condition: User reaches highest tier of season medal
+    if (season.tiers && season.tiers.length > 0) {
+        const topTierValue = season.tiers[season.tiers.length - 1].value;
+        if ((totalActual || 0) >= topTierValue) {
+            cardModule.style.display = 'block';
+            return;
+        }
+    }
+
+    // 3. Condition: Start of the last event of the season (excluding daily bounties)
+    const lastEventStart = getLastEventStartDate(season);
+    if (lastEventStart) {
+        if (new Date() >= lastEventStart) {
+            cardModule.style.display = 'block';
+            return;
+        }
+    } else if (new Date() > new Date(season.endTime)) {
+        // Fallback for mock seasons with no event dates
+        cardModule.style.display = 'block';
+        return;
+    }
+
+    cardModule.style.display = 'none';
+}
+
 function initSeason(id) {
     activeSeasonId = id;
     document.getElementById('placeholder-view').style.display = 'none';
@@ -550,11 +606,7 @@ function initSeason(id) {
         selector.style.display = 'none';
     }
 
-    const cardModule = document.getElementById('card-module');
-    if (cardModule) {
-        const isPassed = new Date() > new Date(season.endTime);
-        cardModule.style.display = (season.cardEnabled || isPassed) ? 'block' : 'none';
-    }
+    updateCardModuleVisibility(season, (allSeasonsData[id] && allSeasonsData[id].globalTotal) || 0);
 
     if (!allSeasonsData[id]) {
         allSeasonsData[id] = { globalTotal: 0, activities: {} };
@@ -958,6 +1010,10 @@ function saveAndRefresh() {
 
 function calculate() {
     let totalActual = userData.globalTotal || 0;
+    const currentSeason = SEASON_DB[activeSeasonId];
+    if (currentSeason) {
+        updateCardModuleVisibility(currentSeason, totalActual);
+    }
     let otherPlannedSum = 0;
 
     ACTIVITIES.forEach(act => {

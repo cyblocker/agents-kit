@@ -17,7 +17,7 @@ const SEASON_DB = {
     ],
     activities: [
       { id: 'bounties', nameKey: 'act_bounties', descKey: 'desc_bounties', max: 6720, unit: 'tokens', isBounty: true },
-      { id: 'anomaly', nameKey: 'act_anomaly', descKey: 'desc_anomaly', max: 30000, unit: 'tokens' }
+      { id: 'anomaly', nameKey: 'act_anomaly', descKey: 'desc_anomaly', utcStart: '2026-06-05T18:00:00Z', max: 30000, unit: 'tokens' }
     ],
     i18n: {
       en: {
@@ -266,4 +266,46 @@ test.describe('Ingress Season Transition & Visibility', () => {
     // Card module should be hidden again
     await expect(cardModule).toBeHidden();
   });
+
+  test('should reactively reveal card module when user reaches the highest medal tier', async ({ page }) => {
+    // 1. Ongoing season before last event (2026-05-15)
+    await mockBrowserDate(page, '2026-05-15T12:00:00Z');
+    await page.goto('http://localhost:8001/?lang=en');
+    await page.evaluate(() => localStorage.clear());
+    await page.goto('http://localhost:8001/?lang=en');
+
+    const cardModule = page.locator('#card-module');
+    const globalTotalInput = page.locator('#global-total-actual');
+
+    // Initially total is 0, card should be hidden
+    await expect(cardModule).toBeHidden();
+
+    // 2. Enter a score below Platinum (25000), e.g. 15000 (Gold)
+    await globalTotalInput.fill('15000');
+    await globalTotalInput.evaluate(el => el.dispatchEvent(new Event('input')));
+    await expect(cardModule).toBeHidden();
+
+    // 3. Reach Platinum tier (25000) -> card module should automatically show!
+    await globalTotalInput.fill('25000');
+    await globalTotalInput.evaluate(el => el.dispatchEvent(new Event('input')));
+    await expect(cardModule).toBeVisible();
+
+    // 4. Reduce score below Platinum -> card module hides again
+    await globalTotalInput.fill('24999');
+    await globalTotalInput.evaluate(el => el.dispatchEvent(new Event('input')));
+    await expect(cardModule).toBeHidden();
+  });
+
+  test('should automatically reveal card module when last event starts even without reaching highest tier', async ({ page }) => {
+    // Last event (anomaly) starts 2026-06-05T18:00:00Z. Mock time to 2026-06-06
+    await mockBrowserDate(page, '2026-06-06T12:00:00Z');
+    await page.goto('http://localhost:8001/?lang=en');
+    await page.evaluate(() => localStorage.clear());
+    await page.goto('http://localhost:8001/?lang=en');
+
+    const cardModule = page.locator('#card-module');
+    // Score is 0, but last event has started -> card module is visible!
+    await expect(cardModule).toBeVisible();
+  });
 });
+

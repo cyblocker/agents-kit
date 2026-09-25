@@ -16,7 +16,7 @@ This runbook guides you through adding a new Ingress Anomaly Season or updating 
 - **`style.css`**: Defines CSS rules, card styles, and fallback badges (`.badge-bronze`, `.badge-silver`, `.badge-gold`, `.badge-platinum`, `.badge-onyx`).
 - **`scripts/convert_badges.py`**: Python script using Pillow that scans a target season directory and converts all `<tier>.png` badge files into `<tier>.webp` (full size) and `<tier>_small.webp` (80×80).
 - **`build.js`**: Minifies `core.js`, `data.js`, `app.js` into `dist/` and computes asset hashes for `dist/sw.js`.
-- **`tests/`**: Playwright test suite validating table calculations, localStorage persistence, URL share payloads, legacy migration, and season transitions.
+- **`tests/`**: Playwright test suite validating data integrity (`data_validation.spec.js`), table calculations, localStorage persistence, URL share payloads, legacy migration, and season transitions.
 
 ---
 
@@ -30,7 +30,7 @@ Read the official announcement (e.g. from `https://ingress.com/news/...` via `re
    - Format: `YYYY_qX_name` (e.g., `2026_q4_cygnus`, `2027_q1_polaris`).
    - Title: e.g., `"Cygnus Anomaly Season (2026 Q4)"`.
 2. **Season Dates**:
-   - `endTime`: ISO local date string for midnight of final day (e.g., `"2026-12-31T23:59:59"`).
+   - `endTime`: ISO local date string for midnight of final day (e.g., `"2026-12-31T23:59:59"`). Must always be later than all event dates within the season.
 3. **Medal Tiers Setup (Variable Tier Counts)**:
    - **Crucial**: Medal tiers vary across seasons! Do not assume exactly 3 tiers:
      - **3 Tiers** (e.g., Apollo, Cygnus): Bronze, Silver, Gold.
@@ -74,9 +74,9 @@ Read the official announcement (e.g. from `https://ingress.com/news/...` via `re
 
 ---
 
-### 2. Badge Acquisition and Image Conversion
+### 2. Badge Acquisition and Card Generation Setup
 
-Adapt your actions according to whether badge assets are available and the number of tiers:
+Adapt your actions according to whether badge assets are available:
 
 1. **If Badge Images Are Available in the Announcement**:
    - For **every tier** in the season's setup:
@@ -94,14 +94,21 @@ Adapt your actions according to whether badge assets are available and the numbe
      - `<tier_name_lowercase>_small.webp` (80×80 for progress bar markers)
    - Set in `data.js`:
      - `badgePath: "static/<season_name>/"`
-     - `cardEnabled: true`
+     - `cardEnabled: true` (or `false` if you want it to unlock automatically only when criteria are met)
 
 2. **If Badge Images Are NOT Yet Available**:
    - Set in `data.js`:
      - `badgePath: ""`
      - `cardEnabled: false`
    - The UI automatically falls back to rendering circular CSS badges with the first letter of each tier and class `badge-${tier.name.toLowerCase()}`.
-   - Verify that `style.css` contains matching CSS classes for any custom tier names (e.g. `.badge-bronze`, `.badge-silver`, `.badge-gold`, `.badge-platinum`, `.badge-onyx`). If a novel tier name is introduced, add its background gradient and box-shadow to `style.css`.
+   - Verify that `style.css` contains matching CSS classes for any custom tier names (e.g. `.badge-bronze`, `.badge-silver`, `.badge-gold`, `.badge-platinum`, `.badge-onyx`).
+
+3. **Automatic Card Visibility Conditions**:
+   The commemorative card generation module (`#card-module`) dynamically reveals itself when **any** of the following conditions are met:
+   - `season.cardEnabled === true`: Manual override flag in `data.js`.
+   - **Highest Medal Tier Achieved**: User's `totalActual` meets or exceeds the top tier requirement (`totalActual >= season.tiers[season.tiers.length - 1].value`).
+   - **Last Event Starts**: The current date/time is at or past the start of the final non-bounty event of the season (`new Date() >= lastEventStartDate`).
+   - **Season Concluded**: Current date has passed `season.endTime`.
 
 ---
 
@@ -133,6 +140,12 @@ Run Playwright tests:
 npm test
 ```
 
+The test suite includes `tests/data_validation.spec.js`, which automatically validates:
+- `endTime` covers all activity start and end dates.
+- Tiers are strictly ascending in value.
+- Bounty formulas match the days and daily maximum.
+- All 4 languages (`zh`, `en`, `ja`, `de`) have complete i18n dictionaries for all activities.
+
 If `CURRENT_SEASON_ID` was changed:
 - Check `tests/table_and_storage.spec.js`: Test 1 verifies that non-bounty activities default to 0 on initial page load. Ensure the locator references an activity row that actually exists in the new default season (e.g. `locator('tr:has-text("...")')`).
 
@@ -143,9 +156,10 @@ If `CURRENT_SEASON_ID` was changed:
 - [ ] Number of tiers and tier names match the official announcement exactly (support 1, 3, 4, 5+ tiers).
 - [ ] If `badgePath` is set, every tier has `<tier_name_lowercase>.png`, `<tier_name_lowercase>.webp`, and `<tier_name_lowercase>_small.webp` in `static/<season_name>/`.
 - [ ] If `badgePath` is empty (`""`), verify fallback CSS `.badge-<tier>` exists in `style.css`.
+- [ ] Season `endTime` strictly covers all activity dates (`lastEventStartDate < endTime`).
 - [ ] Bounty calculation: $\text{days} \times \text{dailyMax} == \text{max}$.
 - [ ] UTC start and end strings end with `Z` (e.g., `2026-10-01T18:00:00Z`).
 - [ ] All four language dictionaries (`zh`, `en`, `ja`, `de`) have entries for every `nameKey` and `descKey`.
 - [ ] Season ID adheres to `YYYY_qX_name` format so `app.js` dropdown renders `Name (YYYYQX)` cleanly.
 - [ ] `npm run build` succeeds without warnings.
-- [ ] `npm test` passes 100%.
+- [ ] `npm test` passes 100% (including `data_validation.spec.js`).
